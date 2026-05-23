@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sistem Manajemen Mahasiswa | Google Sheets Database</title>
+    <title>Sistem Manajemen Mahasiswa | Full Features</title>
     <style>
         * {
             margin: 0;
@@ -11,63 +11,92 @@
             box-sizing: border-box;
         }
 
+        /* CSS Variables untuk Dark/Light Mode */
         :root {
             --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
             --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
             --bg-input: #f1f5f9;
+            --bg-sidebar: #ffffff;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
+            --text-muted: #94a3b8;
             --border: #e2e8f0;
             --primary: #6366f1;
             --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
             --danger: #ef4444;
             --success: #10b981;
             --warning: #f59e0b;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 70px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
 
+        /* Dark Mode */
         body.dark {
             --bg-primary: #0a0a0a;
+            --bg-secondary: #0f0f0f;
             --bg-card: #1a1a1a;
+            --bg-card-hover: #222222;
             --bg-input: #252525;
+            --bg-sidebar: #1a1a1a;
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
+            --text-muted: #6b6b6b;
             --border: #2a2a2a;
             --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
 
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            transition: all 0.3s;
             min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
         }
 
-        /* Sidebar */
+        /* Layout */
         .app-layout {
             display: flex;
             min-height: 100vh;
         }
 
+        /* Sidebar Styles */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: var(--bg-card);
+            background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
-            transition: all 0.3s;
+            transition: var(--transition);
             z-index: 100;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            box-shadow: var(--shadow);
         }
 
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        /* Sidebar Header */
         .sidebar-header {
-            padding: 20px;
+            padding: 24px 20px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .sidebar-header h3 {
@@ -77,11 +106,32 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            white-space: nowrap;
         }
 
+        .sidebar.collapsed .sidebar-header h3 {
+            display: none;
+        }
+
+        .toggle-sidebar {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .toggle-sidebar:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Navigation Menu */
         .nav-menu {
             flex: 1;
-            padding: 16px 12px;
+            padding: 20px 12px;
         }
 
         .nav-item {
@@ -89,20 +139,42 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
             color: var(--text-secondary);
         }
 
-        .nav-item:hover, .nav-item.active {
+        .nav-item:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
 
+        .nav-icon {
+            font-size: 20px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .nav-label {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-label {
+            display: none;
+        }
+
+        /* Sidebar Footer */
         .sidebar-footer {
-            padding: 16px;
+            padding: 20px;
             border-top: 1px solid var(--border);
         }
 
@@ -115,33 +187,59 @@
         .user-avatar-small {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, var(--primary), #a855f7);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            font-size: 16px;
             color: white;
         }
 
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
+            transition: var(--transition);
             padding: 24px;
             min-height: 100vh;
         }
 
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             flex-wrap: wrap;
             gap: 16px;
         }
 
         .page-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             background: linear-gradient(135deg, var(--text-primary), var(--primary));
             -webkit-background-clip: text;
@@ -155,10 +253,32 @@
             align-items: center;
         }
 
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
         .user-badge {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, var(--primary), #a855f7);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 44px;
             display: flex;
             align-items: center;
@@ -168,15 +288,6 @@
             color: white;
         }
 
-        .theme-toggle-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
         .mobile-menu-btn {
             display: none;
             background: var(--bg-input);
@@ -184,16 +295,24 @@
             border-radius: 10px;
             padding: 10px 14px;
             cursor: pointer;
+            font-size: 18px;
+            color: var(--text-primary);
         }
 
         /* Cards */
         .card {
             background: var(--bg-card);
             border-radius: 20px;
-            padding: 20px;
+            padding: 24px;
             margin-bottom: 20px;
             border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .card-header {
@@ -216,6 +335,12 @@
             padding: 16px;
             text-align: center;
             border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
         }
 
         .stat-number {
@@ -238,7 +363,7 @@
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
             background: var(--bg-input);
             color: var(--text-primary);
             border: 1px solid var(--border);
@@ -306,6 +431,12 @@
             padding: 16px;
             margin-bottom: 12px;
             border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .student-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
         }
 
         .student-row {
@@ -320,6 +451,10 @@
             font-weight: 700;
             color: var(--primary);
             cursor: pointer;
+        }
+
+        .student-name:hover {
+            text-decoration: underline;
         }
 
         .grade-badge {
@@ -339,7 +474,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
@@ -377,6 +512,44 @@
             border-radius: 12px;
             color: var(--text-primary);
             font-size: 13px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Password Wrapper untuk Show/Hide */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+            background: rgba(99,102,241,0.1);
         }
 
         .form-row {
@@ -463,7 +636,7 @@
             display: block;
         }
 
-        /* Login */
+        /* Login Page */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
@@ -480,7 +653,7 @@
             max-width: 420px;
             width: 100%;
             border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: var(--shadow-lg);
         }
 
         body.dark .login-card {
@@ -535,34 +708,24 @@
         // 🔧 KONFIGURASI SHEETDB.IO
         // ==========================================
         // GANTI DENGAN API ENDPOINT DARI SHEETDB ANDA!
-        // Dapatkan dari: https://sheetdb.io setelah menghubungkan Google Sheets
-        const SHEETDB_API = 'https://sheetdb.io/api/v1/xffnxq7d9n82j';
-        
-        // Endpoint khusus untuk sheet users (gunakan query parameter sheet)
+        const SHEETDB_API = 'https://sheetdb.io/api/v1/YOUR_API_KEY_HERE';
         const SHEETDB_USERS_API = SHEETDB_API + '?sheet=users';
         const SHEETDB_MAHASISWA_API = SHEETDB_API + '?sheet=mahasiswa';
 
         // ==========================================
-        // DATA USERS (Disimpan di Google Sheets)
+        // VARIABEL GLOBAL
         // ==========================================
         let currentUser = null;
         let students = [];
         let users = [];
         let editTargetNim = null;
         let isEdit = false;
-        let currentMethod = "sequential";
+        let sidebarCollapsed = false;
 
-        // ==========================================
-        // BOBOT PENILAIAN
-        // ==========================================
+        // Bobot penilaian
         const BOBOT = {
-            absensi: 0.05,
-            tugasHarian: 0.10,
-            praktikum: 0.15,
-            uts: 0.20,
-            uas: 0.25,
-            proyek: 0.15,
-            softskill: 0.10
+            absensi: 0.05, tugasHarian: 0.10, praktikum: 0.15,
+            uts: 0.20, uas: 0.25, proyek: 0.15, softskill: 0.10
         };
 
         // ==========================================
@@ -616,58 +779,99 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
 
-        // Theme
+        // ==========================================
+        // FUNGSI TOGGLE PASSWORD (Show/Hide)
+        // ==========================================
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerHTML = "🙈";
+            } else {
+                input.type = "password";
+                btn.innerHTML = "👁️";
+            }
+        }
+
+        // ==========================================
+        // FUNGSI THEME (Dark/Light Mode)
+        // ==========================================
         function initTheme() {
             const savedTheme = localStorage.getItem('app_theme');
-            if (savedTheme === 'dark') document.body.classList.add('dark');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem('app_theme', 'light');
+            }
             updateThemeButton();
         }
 
         function toggleTheme() {
-            document.body.classList.toggle('dark');
-            localStorage.setItem('app_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            if (document.body.classList.contains('dark')) {
+                document.body.classList.remove('dark');
+                localStorage.setItem('app_theme', 'light');
+            } else {
+                document.body.classList.add('dark');
+                localStorage.setItem('app_theme', 'dark');
+            }
             updateThemeButton();
         }
 
         function updateThemeButton() {
             const btn = document.getElementById('themeToggleBtn');
             if (btn) {
-                btn.innerHTML = document.body.classList.contains('dark') ? '☀️ Mode Terang' : '🌙 Mode Gelap';
+                const isDark = document.body.classList.contains('dark');
+                btn.innerHTML = isDark ? '<span>☀️</span><span>Mode Terang</span>' : '<span>🌙</span><span>Mode Gelap</span>';
             }
         }
 
         // ==========================================
-        // FUNGSI CRUD USERS DENGAN GOOGLE SHEETS
+        // FUNGSI SIDEBAR
         // ==========================================
-        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            if (sidebar) {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                const btn = document.querySelector('.toggle-sidebar');
+                if (btn) {
+                    btn.innerHTML = sidebar.classList.contains('collapsed') ? "▶" : "◀";
+                }
+            }
+        }
+
+        function mobileToggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('mobile-open');
+            }
+        }
+
+        // ==========================================
+        // FUNGSI CRUD USERS (Google Sheets)
+        // ==========================================
         async function loadUsers() {
             try {
                 const response = await fetch(SHEETDB_USERS_API);
                 if (!response.ok) throw new Error('Gagal memuat data users');
                 const data = await response.json();
                 users = Array.isArray(data) ? data : [];
-                console.log('Users loaded:', users.length);
             } catch (error) {
                 console.error('Error loading users:', error);
-                // Data default jika gagal load
                 users = [{ username: "admin", password: "admin123", created_at: new Date().toISOString() }];
             }
         }
 
         async function addUserToSheet(username, password) {
             try {
-                const newUser = {
-                    username: username,
-                    password: password,
-                    created_at: new Date().toISOString()
-                };
-                
+                const newUser = { username, password, created_at: new Date().toISOString() };
                 const response = await fetch(SHEETDB_USERS_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: newUser })
                 });
-                
                 if (!response.ok) throw new Error('Gagal menambahkan user');
                 return true;
             } catch (error) {
@@ -677,9 +881,8 @@
         }
 
         // ==========================================
-        // FUNGSI CRUD MAHASISWA DENGAN GOOGLE SHEETS
+        // FUNGSI CRUD MAHASISWA (Google Sheets)
         // ==========================================
-        
         async function loadMahasiswa() {
             try {
                 const response = await fetch(SHEETDB_MAHASISWA_API);
@@ -722,7 +925,6 @@
             const nilai_akhir = hitungNilaiAkhir(data);
             const ipk = hitungIPK(nilai_akhir);
             const grade = getGrade(nilai_akhir);
-            
             const newData = { ...data, nilai_akhir, ipk, grade };
             
             const response = await fetch(SHEETDB_MAHASISWA_API, {
@@ -730,9 +932,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: newData })
             });
-            
             if (!response.ok) throw new Error('Gagal menambahkan data');
-            
             await loadMahasiswa();
             showToast('Mahasiswa berhasil ditambahkan!', 'success', 'globalAlert');
         }
@@ -741,31 +941,22 @@
             const nilai_akhir = hitungNilaiAkhir(newData);
             const ipk = hitungIPK(nilai_akhir);
             const grade = getGrade(nilai_akhir);
-            
             const updatedData = { ...newData, nilai_akhir, ipk, grade };
             
-            // Cari berdasarkan NIM
             const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${oldNim}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: updatedData })
             });
-            
             if (!response.ok) throw new Error('Gagal mengupdate data');
-            
             await loadMahasiswa();
             showToast('Data berhasil diupdate!', 'success', 'globalAlert');
         }
 
         async function deleteStudent(nim) {
             if (!confirm('Yakin ingin menghapus data ini?')) return;
-            
-            const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${nim}`, {
-                method: 'DELETE'
-            });
-            
+            const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${nim}`, { method: 'DELETE' });
             if (!response.ok) throw new Error('Gagal menghapus data');
-            
             await loadMahasiswa();
             showToast('Data berhasil dihapus!', 'success', 'globalAlert');
         }
@@ -833,9 +1024,7 @@
             document.getElementById('detailModal').style.display = 'flex';
         }
 
-        // ==========================================
-        // SEARCH & SORTING (Frontend)
-        // ==========================================
+        // Search
         function searchStudent() {
             const keyword = document.getElementById('searchInput').value.trim();
             if (!keyword) {
@@ -863,6 +1052,7 @@
             area.style.display = 'block';
         }
 
+        // Sorting
         function sortByName() {
             students.sort((a, b) => a.nama.localeCompare(b.nama));
             renderList();
@@ -950,17 +1140,9 @@
                     proyek: parseFloat(document.getElementById('mProyek').value) || 0,
                     softskill: parseFloat(document.getElementById('mSoftskill').value) || 0
                 };
-                
-                if (!/^\d{12}$/.test(data.nim)) {
-                    document.getElementById('errNim').innerText = 'NIM harus 12 digit angka';
-                    return;
-                }
-                
-                if (isEdit) {
-                    await updateStudent(editTargetNim, data);
-                } else {
-                    await addStudent(data);
-                }
+                if (!/^\d{12}$/.test(data.nim)) throw new Error('NIM harus 12 digit angka');
+                if (isEdit) await updateStudent(editTargetNim, data);
+                else await addStudent(data);
                 closeModal();
             } catch (e) {
                 showToast(e.message, 'error', 'modalAlert');
@@ -971,16 +1153,12 @@
         function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
 
         // ==========================================
-        // AUTHENTICATION DENGAN GOOGLE SHEETS
+        // AUTHENTICATION
         // ==========================================
-        
         async function doLogin() {
             const username = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPass').value;
-            
-            // Load users dari Google Sheets
             await loadUsers();
-            
             const user = users.find(u => u.username === username && u.password === password);
             if (!user) {
                 showToast('Username atau password salah!', 'error', 'loginAlert');
@@ -995,7 +1173,6 @@
             const username = document.getElementById('regUser').value.trim();
             const password = document.getElementById('regPass').value;
             const confirm = document.getElementById('regConfirm').value;
-            
             if (username.length < 3) {
                 showToast('Username minimal 3 karakter', 'error', 'regAlert');
                 return;
@@ -1008,19 +1185,12 @@
                 showToast('Konfirmasi password tidak cocok', 'error', 'regAlert');
                 return;
             }
-            
-            // Load users terlebih dahulu
             await loadUsers();
-            
-            // Cek apakah username sudah ada
             if (users.find(u => u.username === username)) {
                 showToast('Username sudah terdaftar!', 'error', 'regAlert');
                 return;
             }
-            
-            // Tambahkan user ke Google Sheets
             const success = await addUserToSheet(username, password);
-            
             if (success) {
                 showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
                 setTimeout(() => showLoginPage(), 1500);
@@ -1043,7 +1213,12 @@
                         </div>
                         <div id="loginAlert" class="alert"></div>
                         <div class="form-group"><label>Username</label><input type="text" id="loginUser" value="admin"></div>
-                        <div class="form-group"><label>Password</label><input type="password" id="loginPass" value="admin123"></div>
+                        <div class="form-group"><label>Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="loginPass" value="admin123">
+                                <button type="button" class="toggle-password" onclick="togglePassword('loginPass', this)">👁️</button>
+                            </div>
+                        </div>
                         <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
                         <div class="demo-info">
                             <p>📋 Demo Akun</p>
@@ -1066,22 +1241,23 @@
                         </div>
                         <div id="regAlert" class="alert"></div>
                         <div class="form-group"><label>Username (min 3)</label><input type="text" id="regUser"></div>
-                        <div class="form-group"><label>Password (min 6)</label><input type="password" id="regPass"></div>
-                        <div class="form-group"><label>Konfirmasi Password</label><input type="password" id="regConfirm"></div>
+                        <div class="form-group"><label>Password (min 6)</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="regPass">
+                                <button type="button" class="toggle-password" onclick="togglePassword('regPass', this)">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Konfirmasi Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="regConfirm">
+                                <button type="button" class="toggle-password" onclick="togglePassword('regConfirm', this)">👁️</button>
+                            </div>
+                        </div>
                         <button class="btn btn-primary" onclick="doRegister()">Daftar</button>
                         <p style="text-align:center;margin-top:20px">Sudah punya akun? <a href="#" onclick="showLoginPage()" style="color:var(--primary)">Login disini</a></p>
                     </div>
                 </div>
             `;
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-            document.getElementById('mainContent').classList.toggle('expanded');
-        }
-
-        function mobileToggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
         }
 
         function switchPage(pageId) {
@@ -1120,7 +1296,10 @@
                         <div class="sidebar-footer">
                             <div class="user-info-sidebar">
                                 <div class="user-avatar-small">${firstLetter}</div>
-                                <div><div>${currentUser?.username || 'Admin'}</div><div style="font-size:11px;color:var(--text-muted)">Administrator</div></div>
+                                <div class="user-details">
+                                    <div class="user-name">${currentUser?.username || 'Admin'}</div>
+                                    <div class="user-role">Administrator</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1135,7 +1314,6 @@
                             </div>
                         </div>
                         
-                        <!-- Page Dashboard -->
                         <div id="page-dashboard" class="page-content active-page">
                             <div class="stats-main">
                                 <div class="stat-card"><div class="stat-number" id="totalMhs">0</div><div class="stat-label">Total Mahasiswa</div></div>
@@ -1146,7 +1324,7 @@
                             <div class="card">
                                 <div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div>
                                 <p>Data tersimpan di <strong>Google Sheets</strong> via SheetDB. Semua perubahan akan langsung tersimpan di Google Drive Anda.</p>
-                                <p><strong>✅ Users juga tersimpan di Google Sheets!</strong> (sheet "users")</p>
+                                <p>✅ <strong>Fitur:</strong> Dark/Light Mode | Show/Hide Password | Sidebar Collapse | Responsive Design</p>
                                 <div class="btn-group" style="margin-top:16px">
                                     <button class="btn btn-primary" onclick="switchPage('datamahasiswa')">Kelola Data Mahasiswa</button>
                                     <button class="btn btn-outline" onclick="switchPage('statistik')">Lihat Statistik</button>
@@ -1154,7 +1332,6 @@
                             </div>
                         </div>
                         
-                        <!-- Page Data Mahasiswa -->
                         <div id="page-datamahasiswa" class="page-content">
                             <div id="globalAlert" class="alert"></div>
                             <div class="btn-group">
@@ -1177,7 +1354,6 @@
                             </div>
                         </div>
                         
-                        <!-- Page Statistik -->
                         <div id="page-statistik" class="page-content">
                             <div class="stats-main">
                                 <div class="stat-card"><div class="stat-number" id="statTotalMhs">0</div><div class="stat-label">Total Mahasiswa</div></div>
@@ -1259,20 +1435,14 @@
         // ==========================================
         async function init() {
             initTheme();
-            // Load users dari Google Sheets untuk cache
             await loadUsers();
-            
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
-                    // Verifikasi user masih ada di database
                     const userExists = users.find(u => u.username === currentUser.username);
-                    if (userExists) {
-                        renderDashboard();
-                    } else {
-                        showLoginPage();
-                    }
+                    if (userExists) renderDashboard();
+                    else showLoginPage();
                 } catch(e) { showLoginPage(); }
             } else {
                 showLoginPage();
@@ -1280,13 +1450,15 @@
         }
 
         // Expose functions ke global
+        window.togglePassword = togglePassword;
+        window.toggleTheme = toggleTheme;
+        window.toggleSidebar = toggleSidebar;
+        window.mobileToggleSidebar = mobileToggleSidebar;
         window.doLogin = doLogin;
         window.doRegister = doRegister;
         window.showLoginPage = showLoginPage;
         window.showRegisterPage = showRegisterPage;
         window.logout = logout;
-        window.toggleSidebar = toggleSidebar;
-        window.mobileToggleSidebar = mobileToggleSidebar;
         window.switchPage = switchPage;
         window.openModal = openModal;
         window.editStudent = editStudent;
@@ -1299,7 +1471,6 @@
         window.sortByName = sortByName;
         window.sortByIpk = sortByIpk;
         window.sortByNilai = sortByNilai;
-        window.toggleTheme = toggleTheme;
 
         init();
     </script>
