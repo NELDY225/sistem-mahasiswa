@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sistem Manajemen Mahasiswa | Full Features</title>
+    <title>Sistem Manajemen Mahasiswa | Dynamic Background</title>
     <style>
         * {
             margin: 0;
@@ -13,16 +13,14 @@
 
         /* CSS Variables untuk Dark/Light Mode */
         :root {
-            --bg-primary: #f5f7fa;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f8fafc;
-            --bg-input: #f1f5f9;
-            --bg-sidebar: #ffffff;
+            --bg-primary: rgba(245, 247, 250, 0.95);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-card-solid: #ffffff;
+            --bg-input: rgba(241, 245, 249, 0.9);
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --text-muted: #94a3b8;
-            --border: #e2e8f0;
+            --border: rgba(226, 232, 240, 0.5);
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --primary-light: #818cf8;
@@ -34,20 +32,19 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
+            --blur-bg: blur(10px);
         }
 
         /* Dark Mode */
         body.dark {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #0f0f0f;
-            --bg-card: #1a1a1a;
-            --bg-card-hover: #222222;
-            --bg-input: #252525;
-            --bg-sidebar: #1a1a1a;
+            --bg-primary: rgba(10, 10, 10, 0.95);
+            --bg-card: rgba(26, 26, 26, 0.95);
+            --bg-card-solid: #1a1a1a;
+            --bg-input: rgba(37, 37, 37, 0.9);
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
             --text-muted: #6b6b6b;
-            --border: #2a2a2a;
+            --border: rgba(42, 42, 42, 0.5);
             --primary: #818cf8;
             --primary-dark: #6366f1;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
@@ -56,27 +53,174 @@
 
         body {
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             transition: var(--transition);
+            position: relative;
+        }
+
+        /* ==========================================
+           DYNAMIC BACKGROUND - ANIMATED GRADIENT
+        ========================================== */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        /* Gradient Background yang Bergerak */
+        .moving-gradient {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                135deg,
+                #667eea 0%,
+                #764ba2 25%,
+                #f093fb 50%,
+                #4facfe 75%,
+                #667eea 100%
+            );
+            animation: moveGradient 15s ease infinite;
+            opacity: 0.15;
+        }
+
+        body.dark .moving-gradient {
+            background: linear-gradient(
+                135deg,
+                #1a1a2e 0%,
+                #16213e 25%,
+                #0f3460 50%,
+                #1a1a2e 75%,
+                #16213e 100%
+            );
+            opacity: 0.3;
+            animation: moveGradientDark 20s ease infinite;
+        }
+
+        @keyframes moveGradient {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        @keyframes moveGradientDark {
+            0% { transform: translate(0%, 0%) rotate(0deg); }
+            25% { transform: translate(5%, -5%) rotate(2deg); }
+            50% { transform: translate(10%, 0%) rotate(0deg); }
+            75% { transform: translate(5%, 5%) rotate(-2deg); }
+            100% { transform: translate(0%, 0%) rotate(0deg); }
+        }
+
+        /* Particle Effect */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatParticle linear infinite;
+        }
+
+        body.dark .particle {
+            background: var(--primary-light);
+            opacity: 0.15;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Bubbles Effect */
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+            border-radius: 50%;
+            animation: bubbleUp 8s ease-in infinite;
+        }
+
+        body.dark .bubble {
+            background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.3), rgba(99,102,241,0.05));
+        }
+
+        @keyframes bubbleUp {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-20vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Glassmorphism Effect untuk Card */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
+            border: 1px solid var(--border);
         }
 
         /* Layout */
         .app-layout {
             display: flex;
             min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Sidebar Styles */
+        /* Sidebar dengan Glassmorphism */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: var(--bg-sidebar);
+            background: var(--bg-card);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
             border-right: 1px solid var(--border);
             transition: var(--transition);
             z-index: 100;
@@ -299,9 +443,11 @@
             color: var(--text-primary);
         }
 
-        /* Cards */
+        /* Cards dengan Glassmorphism */
         .card {
             background: var(--bg-card);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 20px;
@@ -331,6 +477,8 @@
 
         .stat-card {
             background: var(--bg-card);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 16px;
             padding: 16px;
             text-align: center;
@@ -427,6 +575,8 @@
         /* Student List */
         .student-item {
             background: var(--bg-card);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
@@ -483,13 +633,14 @@
         }
 
         .modal-content {
-            background: var(--bg-card);
+            background: var(--bg-card-solid);
             border-radius: 24px;
             padding: 24px;
             max-width: 650px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
+            border: 1px solid var(--border);
         }
 
         .form-group {
@@ -519,7 +670,7 @@
             border-color: var(--primary);
         }
 
-        /* Password Wrapper untuk Show/Hide */
+        /* Password Wrapper */
         .password-wrapper {
             position: relative;
             display: flex;
@@ -642,22 +793,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .login-card {
-            background: white;
+            background: var(--bg-card);
+            backdrop-filter: var(--blur-bg);
+            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 32px;
             padding: 40px;
             max-width: 420px;
             width: 100%;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-lg);
-        }
-
-        body.dark .login-card {
-            background: #1a1a1a;
         }
 
         .login-card h2 {
@@ -701,13 +851,74 @@
     </style>
 </head>
 <body>
+    <!-- Dynamic Background Elements -->
+    <div class="background-animation">
+        <div class="moving-gradient"></div>
+        <div class="particles" id="particles"></div>
+        <div class="bubbles" id="bubbles"></div>
+    </div>
+
     <div id="app-root">Loading...</div>
 
     <script>
         // ==========================================
+        // DYNAMIC BACKGROUND GENERATOR
+        // ==========================================
+        
+        // Generate Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            
+            particlesContainer.innerHTML = '';
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 6 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = Math.random() * 10 + 5 + 's';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Generate Bubbles
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+            if (!bubblesContainer) return;
+            
+            bubblesContainer.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 40 + 10;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDuration = Math.random() * 8 + 4 + 's';
+                bubble.style.animationDelay = Math.random() * 10 + 's';
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+        
+        // Update background saat theme berubah
+        function updateBackgroundForTheme() {
+            const isDark = document.body.classList.contains('dark');
+            const movingGradient = document.querySelector('.moving-gradient');
+            if (movingGradient) {
+                if (isDark) {
+                    movingGradient.style.animation = 'moveGradientDark 20s ease infinite';
+                } else {
+                    movingGradient.style.animation = 'moveGradient 15s ease infinite';
+                }
+            }
+        }
+        
+        // ==========================================
         // 🔧 KONFIGURASI SHEETDB.IO
         // ==========================================
-        // GANTI DENGAN API ENDPOINT DARI SHEETDB ANDA!
         const SHEETDB_API = 'https://sheetdb.io/api/v1/xffnxq7d9n82j';
         const SHEETDB_USERS_API = SHEETDB_API + '?sheet=users';
         const SHEETDB_MAHASISWA_API = SHEETDB_API + '?sheet=mahasiswa';
@@ -720,7 +931,6 @@
         let users = [];
         let editTargetNim = null;
         let isEdit = false;
-        let sidebarCollapsed = false;
 
         // Bobot penilaian
         const BOBOT = {
@@ -780,7 +990,7 @@
         }
 
         // ==========================================
-        // FUNGSI TOGGLE PASSWORD (Show/Hide)
+        // FUNGSI TOGGLE PASSWORD
         // ==========================================
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
@@ -794,7 +1004,7 @@
         }
 
         // ==========================================
-        // FUNGSI THEME (Dark/Light Mode)
+        // FUNGSI THEME
         // ==========================================
         function initTheme() {
             const savedTheme = localStorage.getItem('app_theme');
@@ -805,6 +1015,7 @@
                 localStorage.setItem('app_theme', 'light');
             }
             updateThemeButton();
+            updateBackgroundForTheme();
         }
 
         function toggleTheme() {
@@ -816,6 +1027,7 @@
                 localStorage.setItem('app_theme', 'dark');
             }
             updateThemeButton();
+            updateBackgroundForTheme();
         }
 
         function updateThemeButton() {
@@ -1228,6 +1440,8 @@
                     </div>
                 </div>
             `;
+            createParticles();
+            createBubbles();
         }
 
         function showRegisterPage() {
@@ -1258,6 +1472,8 @@
                     </div>
                 </div>
             `;
+            createParticles();
+            createBubbles();
         }
 
         function switchPage(pageId) {
@@ -1323,8 +1539,8 @@
                             </div>
                             <div class="card">
                                 <div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div>
-                                <p>Data tersimpan di <strong>Google Sheets</strong> via SheetDB. Semua perubahan akan langsung tersimpan di Google Drive Anda.</p>
-                                <p>✅ <strong>Fitur:</strong> Dark/Light Mode | Show/Hide Password | Sidebar Collapse | Responsive Design</p>
+                                <p>✨ Data tersimpan di <strong>Google Sheets</strong> via SheetDB | Latar belakang dinamis bergerak</p>
+                                <p>✅ <strong>Fitur:</strong> Dark/Light Mode | Show/Hide Password | Sidebar Collapse | Background Animasi | Responsive Design</p>
                                 <div class="btn-group" style="margin-top:16px">
                                     <button class="btn btn-primary" onclick="switchPage('datamahasiswa')">Kelola Data Mahasiswa</button>
                                     <button class="btn btn-outline" onclick="switchPage('statistik')">Lihat Statistik</button>
@@ -1420,6 +1636,8 @@
             
             loadMahasiswa();
             updateThemeButton();
+            createParticles();
+            createBubbles();
             
             document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') searchStudent();
@@ -1436,6 +1654,9 @@
         async function init() {
             initTheme();
             await loadUsers();
+            createParticles();
+            createBubbles();
+            
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 try {
