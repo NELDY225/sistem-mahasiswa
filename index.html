@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sistem Manajemen Mahasiswa | Full CRUD Working</title>
+    <title>Sistem Manajemen Mahasiswa | Real-time CRUD</title>
     <style>
         * {
             margin: 0;
@@ -532,29 +532,21 @@
         // ==========================================
         // 🔧 KONFIGURASI SHEETDB.IO
         // ==========================================
-        // GANTI DENGAN API ENDPOINT DARI SHEETDB ANDA!
         const SHEETDB_API = 'https://sheetdb.io/api/v1/xffnxq7d9n82j';
         const SHEETDB_USERS_API = SHEETDB_API + '?sheet=users';
         const SHEETDB_MAHASISWA_API = SHEETDB_API + '?sheet=mahasiswa';
 
-        // ==========================================
-        // VARIABEL GLOBAL
-        // ==========================================
         let currentUser = null;
         let students = [];
         let users = [];
         let editTargetId = null;
         let isEdit = false;
 
-        // Bobot penilaian
         const BOBOT = {
             absensi: 0.05, tugasHarian: 0.10, praktikum: 0.15,
             uts: 0.20, uas: 0.25, proyek: 0.15, softskill: 0.10
         };
 
-        // ==========================================
-        // FUNGSI BANTUAN
-        // ==========================================
         function hitungNilaiAkhir(data) {
             let nilai = 0;
             nilai += (data.absensi || 0) * BOBOT.absensi;
@@ -603,7 +595,6 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
 
-        // Theme
         function initTheme() {
             const savedTheme = localStorage.getItem('app_theme');
             if (savedTheme === 'dark') document.body.classList.add('dark');
@@ -649,7 +640,7 @@
         }
 
         // ==========================================
-        // CRUD MAHASISWA - DENGAN DEBUG LOG
+        // CRUD MAHASISWA - REAL TIME
         // ==========================================
         
         async function loadMahasiswa() {
@@ -661,12 +652,14 @@
                 console.log('Data loaded:', students.length, 'records');
                 renderList();
                 updateStats();
+                return true;
             } catch (error) {
                 console.error('Load error:', error);
                 showToast('Gagal memuat data: ' + error.message, 'error', 'globalAlert');
                 students = [];
                 renderList();
                 updateStats();
+                return false;
             }
         }
 
@@ -680,6 +673,11 @@
             document.getElementById('avgIpk') && (document.getElementById('avgIpk').innerText = avgIpk);
             document.getElementById('avgNilai') && (document.getElementById('avgNilai').innerText = avgNa);
             document.getElementById('gradeCount') && (document.getElementById('gradeCount').innerText = gradeACount);
+            
+            document.getElementById('statTotalMhs') && (document.getElementById('statTotalMhs').innerText = total);
+            document.getElementById('statRataIpk') && (document.getElementById('statRataIpk').innerText = avgIpk);
+            document.getElementById('statRataNilai') && (document.getElementById('statRataNilai').innerText = avgNa);
+            document.getElementById('statGradeA') && (document.getElementById('statGradeA').innerText = gradeACount);
         }
 
         async function addStudent(data) {
@@ -702,7 +700,7 @@
             showToast('Mahasiswa berhasil ditambahkan!', 'success', 'globalAlert');
         }
 
-        // ========== FUNGSI EDIT MAHASISWA (PAKAI ID) ==========
+        // ========== FUNGSI EDIT - REAL TIME ==========
         async function updateStudent(id, newData) {
             console.log('Updating student with ID:', id);
             
@@ -718,11 +716,13 @@
             });
             
             if (!response.ok) throw new Error('Gagal mengupdate data: ' + response.status);
+            
+            // Refresh data setelah update
             await loadMahasiswa();
             showToast('Data berhasil diupdate!', 'success', 'globalAlert');
         }
 
-        // ========== FUNGSI HAPUS MAHASISWA (PAKAI ID) ==========
+        // ========== FUNGSI HAPUS - REAL TIME ==========
         async function deleteStudent(id, nim) {
             if (!confirm(`Yakin ingin menghapus data mahasiswa dengan NIM ${nim}?`)) return;
             
@@ -733,7 +733,12 @@
             });
             
             if (!response.ok) throw new Error('Gagal menghapus data: ' + response.status);
-            await loadMahasiswa();
+            
+            // Langsung hapus dari array lokal tanpa reload (lebih cepat)
+            students = students.filter(s => s.id != id);
+            renderList();
+            updateStats();
+            
             showToast('Data berhasil dihapus!', 'success', 'globalAlert');
         }
 
@@ -761,7 +766,7 @@
                             <span>Nilai: ${parseFloat(s.nilai_akhir || 0).toFixed(1)}</span>
                         </div>
                         <div style="display:flex; gap:8px">
-                            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editStudent('${s.id}', '${s.nim}')">✏️ Edit</button>
+                            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editStudent('${s.id}')">✏️ Edit</button>
                             <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteStudent('${s.id}', '${s.nim}')">🗑️ Hapus</button>
                         </div>
                     </div>
@@ -797,7 +802,6 @@
             document.getElementById('detailModal').style.display = 'flex';
         }
 
-        // Search
         function searchStudent() {
             const keyword = document.getElementById('searchInput').value.trim();
             if (!keyword) {
@@ -825,7 +829,6 @@
             area.style.display = 'block';
         }
 
-        // Sorting
         function sortByName() {
             students.sort((a, b) => a.nama.localeCompare(b.nama));
             renderList();
@@ -844,9 +847,6 @@
             showToast('Diurutkan berdasarkan Nilai Akhir', 'success', 'globalAlert');
         }
 
-        // ==========================================
-        // MODAL HANDLERS
-        // ==========================================
         function openModal() {
             isEdit = false;
             editTargetId = null;
@@ -855,7 +855,7 @@
             document.getElementById('crudModal').style.display = 'flex';
         }
 
-        function editStudent(id, nim) {
+        function editStudent(id) {
             const s = students.find(x => x.id == id);
             if (!s) {
                 showToast('Data tidak ditemukan!', 'error', 'globalAlert');
@@ -948,6 +948,32 @@
             renderDashboard();
         }
 
+        async function doRegister() {
+            const username = document.getElementById('regUser').value.trim();
+            const password = document.getElementById('regPass').value;
+            const confirm = document.getElementById('regConfirm').value;
+            if (username.length < 3) {
+                showToast('Username minimal 3 karakter', 'error', 'regAlert');
+                return;
+            }
+            if (password.length < 6) {
+                showToast('Password minimal 6 karakter', 'error', 'regAlert');
+                return;
+            }
+            if (password !== confirm) {
+                showToast('Konfirmasi password tidak cocok', 'error', 'regAlert');
+                return;
+            }
+            await loadUsers();
+            if (users.find(u => u.username === username)) {
+                showToast('Username sudah terdaftar!', 'error', 'regAlert');
+                return;
+            }
+            users.push({ username, password });
+            showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
+            setTimeout(() => showLoginPage(), 1500);
+        }
+
         function showLoginPage() {
             document.getElementById('app-root').innerHTML = `
                 <div class="login-wrapper">
@@ -989,32 +1015,6 @@
                     </div>
                 </div>
             `;
-        }
-
-        async function doRegister() {
-            const username = document.getElementById('regUser').value.trim();
-            const password = document.getElementById('regPass').value;
-            const confirm = document.getElementById('regConfirm').value;
-            if (username.length < 3) {
-                showToast('Username minimal 3 karakter', 'error', 'regAlert');
-                return;
-            }
-            if (password.length < 6) {
-                showToast('Password minimal 6 karakter', 'error', 'regAlert');
-                return;
-            }
-            if (password !== confirm) {
-                showToast('Konfirmasi password tidak cocok', 'error', 'regAlert');
-                return;
-            }
-            await loadUsers();
-            if (users.find(u => u.username === username)) {
-                showToast('Username sudah terdaftar!', 'error', 'regAlert');
-                return;
-            }
-            users.push({ username, password });
-            showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
-            setTimeout(() => showLoginPage(), 1500);
         }
 
         function switchPage(pageId) {
@@ -1077,7 +1077,7 @@
                             </div>
                             <div class="card">
                                 <div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div>
-                                <p>✨ Data tersimpan di <strong>Google Sheets</strong> via SheetDB</p>
+                                <p>✨ Data tersimpan di <strong>Google Sheets</strong> via SheetDB | Real-time CRUD</p>
                                 <p>✅ <strong>Fitur Lengkap:</strong> Tambah | Edit | Hapus | Cari | Urutkan | Dark/Light Mode</p>
                                 <div class="btn-group" style="margin-top:16px">
                                     <button class="btn btn-primary" onclick="switchPage('datamahasiswa')">Kelola Data Mahasiswa</button>
