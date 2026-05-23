@@ -1,9 +1,9 @@
-v<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sistem Manajemen Mahasiswa | Dynamic Background</title>
+    <title>Sistem Manajemen Mahasiswa | Full CRUD</title>
     <style>
         * {
             margin: 0;
@@ -11,10 +11,9 @@ v<!DOCTYPE html>
             box-sizing: border-box;
         }
 
-        /* CSS Variables untuk Dark/Light Mode */
         :root {
             --bg-primary: rgba(245, 247, 250, 0.92);
-            --bg-card: rgba(255, 255, 255, 0.92);
+            --bg-card: rgba(255, 255, 255, 0.95);
             --bg-card-solid: #ffffff;
             --bg-input: rgba(241, 245, 249, 0.9);
             --text-primary: #1e293b;
@@ -35,10 +34,9 @@ v<!DOCTYPE html>
             --blur-bg: blur(12px);
         }
 
-        /* Dark Mode */
         body.dark {
             --bg-primary: rgba(10, 10, 10, 0.92);
-            --bg-card: rgba(26, 26, 26, 0.92);
+            --bg-card: rgba(26, 26, 26, 0.95);
             --bg-card-solid: #1a1a1a;
             --bg-input: rgba(37, 37, 37, 0.9);
             --text-primary: #ffffff;
@@ -60,9 +58,81 @@ v<!DOCTYPE html>
             position: relative;
         }
 
-        /* ==========================================
-           PREMIUM LOADING SCREEN
-        ========================================== */
+        /* Background Animasi */
+        .bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: floatOrb 25s ease-in-out infinite;
+        }
+
+        .gradient-orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.1));
+            top: -150px;
+            left: -150px;
+        }
+
+        .gradient-orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.1));
+            bottom: -200px;
+            right: -150px;
+            animation-delay: 5s;
+        }
+
+        .gradient-orb-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3), rgba(99, 102, 241, 0.1));
+            top: 40%;
+            left: 30%;
+            animation-delay: 10s;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0%, 0%) scale(1); }
+            33% { transform: translate(5%, -5%) scale(1.05); }
+            66% { transform: translate(-3%, 3%) scale(0.98); }
+            100% { transform: translate(0%, 0%) scale(1); }
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.06;
+            animation: floatParticle 20s ease-in-out infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -20px) rotate(120deg); }
+            66% { transform: translate(-20px, 15px) rotate(240deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* Loading Screen */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -75,7 +145,7 @@ v<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.5s ease;
         }
 
         body.dark .loading-screen {
@@ -97,12 +167,9 @@ v<!DOCTYPE html>
             justify-content: center;
             margin-bottom: 24px;
             animation: pulse 1.5s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(255,255,255,0.3);
         }
 
-        .loading-logo span {
-            font-size: 48px;
-        }
+        .loading-logo span { font-size: 48px; }
 
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
@@ -110,28 +177,9 @@ v<!DOCTYPE html>
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255,255,255,0); }
         }
 
-        .loading-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 16px;
-            letter-spacing: 2px;
-        }
-
-        .loading-dots {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .loading-dots span {
-            width: 10px;
-            height: 10px;
-            background: white;
-            border-radius: 50%;
-            animation: bounce 1.4s ease-in-out infinite;
-        }
-
+        .loading-text { font-size: 24px; font-weight: 700; color: white; margin-bottom: 16px; letter-spacing: 2px; }
+        .loading-dots { display: flex; gap: 8px; margin-bottom: 24px; }
+        .loading-dots span { width: 10px; height: 10px; background: white; border-radius: 50%; animation: bounce 1.4s ease-in-out infinite; }
         .loading-dots span:nth-child(1) { animation-delay: 0s; }
         .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
         .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
@@ -141,202 +189,12 @@ v<!DOCTYPE html>
             30% { transform: translateY(-10px); opacity: 1; }
         }
 
-        .loading-bar-container {
-            width: 200px;
-            height: 3px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .loading-bar {
-            width: 0%;
-            height: 100%;
-            background: white;
-            border-radius: 3px;
-            animation: loadingProgress 1.5s ease-in-out infinite;
-        }
-
-        @keyframes loadingProgress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
-
-        /* ==========================================
-           CLEAN DYNAMIC BACKGROUND - NO BUBBLES!
-        ========================================== */
-        .bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            pointer-events: none;
-        }
-
-        /* Gradient Orbs yang bergerak perlahan */
-        .gradient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: floatOrb 25s ease-in-out infinite;
-        }
-
-        .gradient-orb-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.1));
-            top: -150px;
-            left: -150px;
-            animation-delay: 0s;
-        }
-
-        .gradient-orb-2 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.1));
-            bottom: -200px;
-            right: -150px;
-            animation-delay: 5s;
-        }
-
-        .gradient-orb-3 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.3), rgba(99, 102, 241, 0.1));
-            top: 40%;
-            left: 30%;
-            animation-delay: 10s;
-        }
-
-        body.dark .gradient-orb-1 {
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.05));
-        }
-        body.dark .gradient-orb-2 {
-            background: radial-gradient(circle, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.05));
-        }
-        body.dark .gradient-orb-3 {
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.05));
-        }
-
-        @keyframes floatOrb {
-            0% {
-                transform: translate(0%, 0%) scale(1);
-            }
-            33% {
-                transform: translate(5%, -5%) scale(1.05);
-            }
-            66% {
-                transform: translate(-3%, 3%) scale(0.98);
-            }
-            100% {
-                transform: translate(0%, 0%) scale(1);
-            }
-        }
-
-        /* Moving Wave Lines */
-        .wave-lines {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            opacity: 0.15;
-        }
-
-        .wave {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: repeating-linear-gradient(
-                transparent,
-                transparent 48px,
-                var(--primary) 48px,
-                var(--primary) 52px
-            );
-            animation: moveWave 8s linear infinite;
-        }
-
-        .wave-2 {
-            bottom: 50px;
-            opacity: 0.5;
-            animation: moveWave 12s linear infinite reverse;
-        }
-
-        body.dark .wave {
-            background: repeating-linear-gradient(
-                transparent,
-                transparent 48px,
-                var(--primary) 48px,
-                var(--primary) 52px
-            );
-            opacity: 0.1;
-        }
-
-        @keyframes moveWave {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-100px);
-            }
-        }
-
-        /* Floating Particles halus */
-        .floating-particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            background: var(--primary);
-            border-radius: 50%;
-            opacity: 0.06;
-            animation: floatParticle 20s ease-in-out infinite;
-        }
-
-        body.dark .particle {
-            background: var(--primary-light);
-            opacity: 0.04;
-        }
-
-        @keyframes floatParticle {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            33% {
-                transform: translate(30px, -20px) rotate(120deg);
-            }
-            66% {
-                transform: translate(-20px, 15px) rotate(240deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
-        }
-
-        /* Glassmorphism Effect untuk Card */
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: var(--blur-bg);
-            -webkit-backdrop-filter: var(--blur-bg);
-            border: 1px solid var(--border);
-        }
+        .loading-bar-container { width: 200px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+        .loading-bar { width: 0%; height: 100%; background: white; border-radius: 3px; animation: loadingProgress 1.5s ease-in-out infinite; }
+        @keyframes loadingProgress { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
 
         /* Layout */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
+        .app-layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
 
         /* Sidebar */
         .sidebar {
@@ -347,7 +205,6 @@ v<!DOCTYPE html>
             height: 100vh;
             background: var(--bg-card);
             backdrop-filter: var(--blur-bg);
-            -webkit-backdrop-filter: var(--blur-bg);
             border-right: 1px solid var(--border);
             transition: var(--transition);
             z-index: 100;
@@ -357,9 +214,7 @@ v<!DOCTYPE html>
             box-shadow: var(--shadow);
         }
 
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed);
-        }
+        .sidebar.collapsed { width: var(--sidebar-collapsed); }
 
         .sidebar-header {
             padding: 24px 20px;
@@ -391,16 +246,9 @@ v<!DOCTYPE html>
             transition: var(--transition);
         }
 
-        .toggle-sidebar:hover {
-            background: var(--primary);
-            color: white;
-        }
+        .toggle-sidebar:hover { background: var(--primary); color: white; }
 
-        .nav-menu {
-            flex: 1;
-            padding: 20px 12px;
-        }
-
+        .nav-menu { flex: 1; padding: 20px 12px; }
         .nav-item {
             display: flex;
             align-items: center;
@@ -412,32 +260,14 @@ v<!DOCTYPE html>
             transition: var(--transition);
             color: var(--text-secondary);
         }
-
-        .nav-item:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--text-primary);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
+        .nav-item:hover { background: rgba(99, 102, 241, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
         .nav-icon { font-size: 20px; min-width: 24px; text-align: center; }
         .nav-label { font-size: 14px; font-weight: 500; white-space: nowrap; }
         .sidebar.collapsed .nav-label { display: none; }
 
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        .user-info-sidebar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); }
+        .user-info-sidebar { display: flex; align-items: center; gap: 12px; }
         .user-avatar-small {
             width: 40px;
             height: 40px;
@@ -450,9 +280,7 @@ v<!DOCTYPE html>
             font-size: 16px;
             color: white;
         }
-
         .sidebar.collapsed .user-details { display: none; }
-
         .user-details { flex: 1; }
         .user-name { font-size: 14px; font-weight: 600; }
         .user-role { font-size: 11px; color: var(--text-muted); }
@@ -465,7 +293,6 @@ v<!DOCTYPE html>
             padding: 24px;
             min-height: 100vh;
         }
-
         .main-content.expanded { margin-left: var(--sidebar-collapsed); }
 
         /* Top Bar */
@@ -477,7 +304,6 @@ v<!DOCTYPE html>
             flex-wrap: wrap;
             gap: 16px;
         }
-
         .page-title {
             font-size: 28px;
             font-weight: 700;
@@ -486,12 +312,7 @@ v<!DOCTYPE html>
             background-clip: text;
             color: transparent;
         }
-
-        .top-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
+        .top-actions { display: flex; gap: 12px; align-items: center; }
 
         .theme-toggle-btn {
             background: var(--bg-input);
@@ -507,12 +328,7 @@ v<!DOCTYPE html>
             color: var(--text-primary);
             transition: var(--transition);
         }
-
-        .theme-toggle-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
+        .theme-toggle-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
 
         .user-badge {
             width: 44px;
@@ -542,7 +358,6 @@ v<!DOCTYPE html>
         .card {
             background: var(--bg-card);
             backdrop-filter: var(--blur-bg);
-            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 20px;
@@ -550,17 +365,8 @@ v<!DOCTYPE html>
             transition: var(--transition);
             box-shadow: var(--shadow);
         }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-header {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
+        .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .card-header { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
 
         /* Stats */
         .stats-main {
@@ -569,34 +375,18 @@ v<!DOCTYPE html>
             gap: 16px;
             margin-bottom: 20px;
         }
-
         .stat-card {
             background: var(--bg-card);
             backdrop-filter: var(--blur-bg);
-            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 16px;
             padding: 16px;
             text-align: center;
             border: 1px solid var(--border);
             transition: var(--transition);
         }
-
-        .stat-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-        }
+        .stat-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .stat-number { font-size: 28px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
 
         /* Buttons */
         .btn {
@@ -611,104 +401,38 @@ v<!DOCTYPE html>
             color: var(--text-primary);
             border: 1px solid var(--border);
         }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-            border: none;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .btn-danger { background: var(--danger); color: white; border: none; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
 
         /* Search */
-        .search-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .search-row input {
-            flex: 1;
-            padding: 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            color: var(--text-primary);
-        }
+        .search-row { display: flex; gap: 12px; margin-top: 16px; }
+        .search-row input { flex: 1; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 40px; color: var(--text-primary); }
 
         /* Student List */
         .student-item {
             background: var(--bg-card);
             backdrop-filter: var(--blur-bg);
-            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
             border: 1px solid var(--border);
             transition: var(--transition);
         }
+        .student-item:hover { border-color: var(--primary); transform: translateX(4px); }
+        .student-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .student-name { font-weight: 700; color: var(--primary); cursor: pointer; }
+        .student-name:hover { text-decoration: underline; }
 
-        .student-item:hover {
-            border-color: var(--primary);
-            transform: translateX(4px);
-        }
-
-        .student-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .student-name {
-            font-weight: 700;
-            color: var(--primary);
-            cursor: pointer;
-        }
-
-        .student-name:hover {
-            text-decoration: underline;
-        }
-
-        .grade-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
+        .grade-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .grade-A { background: rgba(16,185,129,0.2); color: #10b981; }
         .grade-B { background: rgba(59,130,246,0.2); color: #3b82f6; }
         .grade-C { background: rgba(245,158,11,0.2); color: #f59e0b; }
@@ -726,7 +450,6 @@ v<!DOCTYPE html>
             z-index: 1000;
             padding: 16px;
         }
-
         .modal-content {
             background: var(--bg-card-solid);
             border-radius: 24px;
@@ -737,46 +460,13 @@ v<!DOCTYPE html>
             overflow-y: auto;
             border: 1px solid var(--border);
         }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+        .form-group input { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-size: 13px; }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 13px;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Password Wrapper */
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-wrapper input {
-            width: 100%;
-            padding: 12px 45px 12px 16px;
-        }
-
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        .password-wrapper input { width: 100%; padding: 12px 45px 12px 16px; }
         .toggle-password {
             position: absolute;
             right: 12px;
@@ -785,102 +475,28 @@ v<!DOCTYPE html>
             cursor: pointer;
             font-size: 18px;
             padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border-radius: 40px;
-            transition: var(--transition);
             color: var(--text-secondary);
         }
+        .toggle-password:hover { color: var(--primary); background: rgba(99,102,241,0.1); }
 
-        .toggle-password:hover {
-            color: var(--primary);
-            background: rgba(99,102,241,0.1);
-        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .error-text { color: var(--danger); font-size: 11px; margin-top: 4px; display: block; }
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 16px; display: none; font-size: 13px; }
+        .alert-success { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .alert-error { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
 
-        .form-row-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
+        .empty { text-align: center; padding: 40px; color: var(--text-secondary); }
+        .detail-row { display: flex; margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .detail-label { width: 100px; font-weight: 600; color: var(--text-secondary); }
+        .detail-value { flex: 1; }
+        .bobot-info { background: rgba(99,102,241,0.1); border-radius: 12px; padding: 12px; margin-top: 12px; font-size: 11px; }
 
-        .form-row-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .error-text {
-            color: var(--danger);
-            font-size: 11px;
-            margin-top: 4px;
-            display: block;
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            display: none;
-            font-size: 13px;
-        }
-
-        .alert-success {
-            background: rgba(16,185,129,0.15);
-            color: #10b981;
-            border: 1px solid rgba(16,185,129,0.3);
-        }
-
-        .alert-error {
-            background: rgba(239,68,68,0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239,68,68,0.3);
-        }
-
-        .empty {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-
-        .detail-row {
-            display: flex;
-            margin-bottom: 12px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .detail-label {
-            width: 100px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .detail-value {
-            flex: 1;
-        }
-
-        .bobot-info {
-            background: rgba(99,102,241,0.1);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 12px;
-            font-size: 11px;
-        }
-
-        .page-content {
-            display: none;
-        }
-
-        .page-content.active-page {
-            display: block;
-        }
+        .page-content { display: none; }
+        .page-content.active-page { display: block; }
 
         /* Login Page */
         .login-wrapper {
@@ -892,11 +508,9 @@ v<!DOCTYPE html>
             position: relative;
             z-index: 1;
         }
-
         .login-card {
             background: var(--bg-card);
             backdrop-filter: var(--blur-bg);
-            -webkit-backdrop-filter: var(--blur-bg);
             border-radius: 32px;
             padding: 40px;
             max-width: 420px;
@@ -904,35 +518,10 @@ v<!DOCTYPE html>
             border: 1px solid var(--border);
             box-shadow: var(--shadow-lg);
         }
-
-        .login-card h2 {
-            text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .demo-info {
-            margin-top: 20px;
-            padding: 12px;
-            background: rgba(99,102,241,0.1);
-            border-radius: 12px;
-            text-align: center;
-            font-size: 12px;
-        }
-
-        .demo-badge {
-            display: inline-flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 8px;
-        }
-
-        .demo-badge span {
-            background: var(--bg-input);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-family: monospace;
-        }
+        .login-card h2 { text-align: center; margin-bottom: 8px; }
+        .demo-info { margin-top: 20px; padding: 12px; background: rgba(99,102,241,0.1); border-radius: 12px; text-align: center; font-size: 12px; }
+        .demo-badge { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+        .demo-badge span { background: var(--bg-input); padding: 4px 12px; border-radius: 20px; font-family: monospace; }
 
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); position: fixed; }
@@ -946,7 +535,6 @@ v<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <!-- CLEAN DYNAMIC BACKGROUND - NO BUBBLES! -->
     <div class="bg-canvas">
         <div class="gradient-orb gradient-orb-1"></div>
         <div class="gradient-orb gradient-orb-2"></div>
@@ -954,32 +542,20 @@ v<!DOCTYPE html>
         <div class="floating-particles" id="particlesContainer"></div>
     </div>
 
-    <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="loading-logo">
-            <span>🎓</span>
-        </div>
+        <div class="loading-logo"><span>🎓</span></div>
         <div class="loading-text">Memuat Sistem</div>
-        <div class="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="loading-bar-container">
-            <div class="loading-bar"></div>
-        </div>
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <div class="loading-bar-container"><div class="loading-bar"></div></div>
     </div>
 
     <div id="app-root" style="display: none;"></div>
 
     <script>
-        // ==========================================
-        // GENERATE FLOATING PARTICLES (HALUS)
-        // ==========================================
+        // Generate Particles
         function generateParticles() {
             const container = document.getElementById('particlesContainer');
             if (!container) return;
-            
             container.innerHTML = '';
             for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
@@ -994,14 +570,10 @@ v<!DOCTYPE html>
                 container.appendChild(particle);
             }
         }
-        
-        // ==========================================
-        // HIDE LOADING SCREEN
-        // ==========================================
+
         function hideLoading() {
             const loadingScreen = document.getElementById('loadingScreen');
             const appRoot = document.getElementById('app-root');
-            
             if (loadingScreen) {
                 loadingScreen.classList.add('fade-out');
                 setTimeout(() => {
@@ -1012,32 +584,25 @@ v<!DOCTYPE html>
                 if (appRoot) appRoot.style.display = 'block';
             }
         }
-        
+
         // ==========================================
-        // 🔧 KONFIGURASI SHEETDB.IO
+        // KONFIGURASI SHEETDB.IO
         // ==========================================
         const SHEETDB_API = 'https://sheetdb.io/api/v1/xffnxq7d9n82j';
         const SHEETDB_USERS_API = SHEETDB_API + '?sheet=users';
         const SHEETDB_MAHASISWA_API = SHEETDB_API + '?sheet=mahasiswa';
 
-        // ==========================================
-        // VARIABEL GLOBAL
-        // ==========================================
         let currentUser = null;
         let students = [];
         let users = [];
         let editTargetNim = null;
         let isEdit = false;
 
-        // Bobot penilaian
         const BOBOT = {
             absensi: 0.05, tugasHarian: 0.10, praktikum: 0.15,
             uts: 0.20, uas: 0.25, proyek: 0.15, softskill: 0.10
         };
 
-        // ==========================================
-        // FUNGSI BANTUAN
-        // ==========================================
         function hitungNilaiAkhir(data) {
             let nilai = 0;
             nilai += (data.absensi || 0) * BOBOT.absensi;
@@ -1086,9 +651,7 @@ v<!DOCTYPE html>
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
 
-        // ==========================================
-        // FUNGSI TOGGLE PASSWORD
-        // ==========================================
+        // Password Toggle
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
             if (input.type === "password") {
@@ -1100,28 +663,17 @@ v<!DOCTYPE html>
             }
         }
 
-        // ==========================================
-        // FUNGSI THEME
-        // ==========================================
+        // Theme
         function initTheme() {
             const savedTheme = localStorage.getItem('app_theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
-                localStorage.setItem('app_theme', 'light');
-            }
+            if (savedTheme === 'dark') document.body.classList.add('dark');
+            else document.body.classList.remove('dark');
             updateThemeButton();
         }
 
         function toggleTheme() {
-            if (document.body.classList.contains('dark')) {
-                document.body.classList.remove('dark');
-                localStorage.setItem('app_theme', 'light');
-            } else {
-                document.body.classList.add('dark');
-                localStorage.setItem('app_theme', 'dark');
-            }
+            document.body.classList.toggle('dark');
+            localStorage.setItem('app_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
             updateThemeButton();
         }
 
@@ -1129,13 +681,11 @@ v<!DOCTYPE html>
             const btn = document.getElementById('themeToggleBtn');
             if (btn) {
                 const isDark = document.body.classList.contains('dark');
-                btn.innerHTML = isDark ? '<span>☀️</span><span>Mode Terang</span>' : '<span>🌙</span><span>Mode Gelap</span>';
+                btn.innerHTML = isDark ? '☀️ Mode Terang' : '🌙 Mode Gelap';
             }
         }
 
-        // ==========================================
-        // FUNGSI SIDEBAR
-        // ==========================================
+        // Sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
@@ -1143,31 +693,23 @@ v<!DOCTYPE html>
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
                 const btn = document.querySelector('.toggle-sidebar');
-                if (btn) {
-                    btn.innerHTML = sidebar.classList.contains('collapsed') ? "▶" : "◀";
-                }
+                if (btn) btn.innerHTML = sidebar.classList.contains('collapsed') ? "▶" : "◀";
             }
         }
 
         function mobileToggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) {
-                sidebar.classList.toggle('mobile-open');
-            }
+            document.getElementById('sidebar')?.classList.toggle('mobile-open');
         }
 
-        // ==========================================
-        // FUNGSI CRUD USERS (Google Sheets)
-        // ==========================================
+        // CRUD Users
         async function loadUsers() {
             try {
                 const response = await fetch(SHEETDB_USERS_API);
-                if (!response.ok) throw new Error('Gagal memuat data users');
+                if (!response.ok) throw new Error();
                 const data = await response.json();
                 users = Array.isArray(data) ? data : [];
             } catch (error) {
-                console.error('Error loading users:', error);
-                users = [{ username: "admin", password: "admin123", created_at: new Date().toISOString() }];
+                users = [{ username: "admin", password: "admin123" }];
             }
         }
 
@@ -1179,28 +721,24 @@ v<!DOCTYPE html>
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: newUser })
                 });
-                if (!response.ok) throw new Error('Gagal menambahkan user');
-                return true;
-            } catch (error) {
-                console.error('Error adding user:', error);
-                return false;
-            }
+                return response.ok;
+            } catch { return false; }
         }
 
         // ==========================================
-        // FUNGSI CRUD MAHASISWA (Google Sheets)
+        // CRUD MAHASISWA - EDIT & DELETE BERFUNGSI
         // ==========================================
+        
         async function loadMahasiswa() {
             try {
                 const response = await fetch(SHEETDB_MAHASISWA_API);
-                if (!response.ok) throw new Error('Gagal memuat data');
+                if (!response.ok) throw new Error();
                 const data = await response.json();
                 students = Array.isArray(data) ? data : [];
                 renderList();
                 updateStats();
             } catch (error) {
-                console.error('Error:', error);
-                showToast('Gagal memuat data dari database', 'error', 'globalAlert');
+                showToast('Gagal memuat data', 'error', 'globalAlert');
                 students = [];
                 renderList();
                 updateStats();
@@ -1217,11 +755,6 @@ v<!DOCTYPE html>
             document.getElementById('avgIpk') && (document.getElementById('avgIpk').innerText = avgIpk);
             document.getElementById('avgNilai') && (document.getElementById('avgNilai').innerText = avgNa);
             document.getElementById('gradeCount') && (document.getElementById('gradeCount').innerText = gradeACount);
-            
-            document.getElementById('statTotalMhs') && (document.getElementById('statTotalMhs').innerText = total);
-            document.getElementById('statRataIpk') && (document.getElementById('statRataIpk').innerText = avgIpk);
-            document.getElementById('statRataNilai') && (document.getElementById('statRataNilai').innerText = avgNa);
-            document.getElementById('statGradeA') && (document.getElementById('statGradeA').innerText = gradeACount);
         }
 
         async function addStudent(data) {
@@ -1239,38 +772,49 @@ v<!DOCTYPE html>
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: newData })
             });
-            if (!response.ok) throw new Error('Gagal menambahkan data');
+            if (!response.ok) throw new Error('Gagal menambahkan');
             await loadMahasiswa();
             showToast('Mahasiswa berhasil ditambahkan!', 'success', 'globalAlert');
         }
 
+        // ========== FUNGSI EDIT MAHASISWA ==========
         async function updateStudent(oldNim, newData) {
             const nilai_akhir = hitungNilaiAkhir(newData);
             const ipk = hitungIPK(nilai_akhir);
             const grade = getGrade(nilai_akhir);
             const updatedData = { ...newData, nilai_akhir, ipk, grade };
             
-            const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${oldNim}`, {
+            // Cari ID dari data yang akan diupdate
+            const studentToUpdate = students.find(s => s.nim === oldNim);
+            if (!studentToUpdate) throw new Error('Data tidak ditemukan');
+            
+            const response = await fetch(`${SHEETDB_MAHASISWA_API}/${studentToUpdate.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: updatedData })
             });
+            
             if (!response.ok) throw new Error('Gagal mengupdate data');
             await loadMahasiswa();
             showToast('Data berhasil diupdate!', 'success', 'globalAlert');
         }
 
+        // ========== FUNGSI HAPUS MAHASISWA ==========
         async function deleteStudent(nim) {
-            if (!confirm('Yakin ingin menghapus data ini?')) return;
-            const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${nim}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Gagal menghapus数据');
+            if (!confirm('Yakin ingin menghapus data mahasiswa ini?')) return;
+            
+            const studentToDelete = students.find(s => s.nim === nim);
+            if (!studentToDelete) throw new Error('Data tidak ditemukan');
+            
+            const response = await fetch(`${SHEETDB_MAHASISWA_API}/${studentToDelete.id}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) throw new Error('Gagal menghapus data');
             await loadMahasiswa();
             showToast('Data berhasil dihapus!', 'success', 'globalAlert');
         }
 
-        // ==========================================
-        // RENDER FUNCTIONS
-        // ==========================================
         function renderList() {
             const container = document.getElementById('studentList');
             if (!container) return;
@@ -1295,8 +839,8 @@ v<!DOCTYPE html>
                             <span>Nilai: ${parseFloat(s.nilai_akhir || 0).toFixed(1)}</span>
                         </div>
                         <div style="display:flex; gap:8px">
-                            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editStudent('${s.nim}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteStudent('${s.nim}')">Hapus</button>
+                            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editStudent('${s.nim}')">✏️ Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteStudent('${s.nim}')">🗑️ Hapus</button>
                         </div>
                     </div>
                 `;
@@ -1324,9 +868,7 @@ v<!DOCTYPE html>
                     Softskill: ${s.softskill || 0}<br>
                     <strong>🎯 Nilai Akhir: ${parseFloat(s.nilai_akhir || 0).toFixed(2)}</strong>
                 </div>
-                <div class="bobot-info">
-                    <strong>Bobot Penilaian:</strong> Absensi 5% | Tugas 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%
-                </div>
+                <div class="bobot-info">Bobot: Absensi 5% | Tugas 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%</div>
             `;
             document.getElementById('detailModal').style.display = 'flex';
         }
@@ -1335,12 +877,11 @@ v<!DOCTYPE html>
         function searchStudent() {
             const keyword = document.getElementById('searchInput').value.trim();
             if (!keyword) {
-                showToast('Masukkan kata kunci pencarian', 'warning', 'globalAlert');
+                showToast('Masukkan kata kunci', 'warning', 'globalAlert');
                 return;
             }
             const results = students.filter(s => 
-                s.nama.toLowerCase().includes(keyword.toLowerCase()) || 
-                s.nim.includes(keyword)
+                s.nama.toLowerCase().includes(keyword.toLowerCase()) || s.nim.includes(keyword)
             );
             const area = document.getElementById('searchResultArea');
             if (results.length === 0) {
@@ -1378,9 +919,7 @@ v<!DOCTYPE html>
             showToast('Diurutkan berdasarkan Nilai Akhir', 'success', 'globalAlert');
         }
 
-        // ==========================================
-        // MODAL HANDLERS
-        // ==========================================
+        // Modal Handlers
         function openModal() {
             isEdit = false;
             editTargetNim = null;
@@ -1427,7 +966,6 @@ v<!DOCTYPE html>
             document.getElementById('mUAS').value = 80;
             document.getElementById('mProyek').value = 80;
             document.getElementById('mSoftskill').value = 80;
-            document.getElementById('errNim').innerText = '';
         }
 
         async function saveStudent() {
@@ -1459,9 +997,7 @@ v<!DOCTYPE html>
         function closeModal() { document.getElementById('crudModal').style.display = 'none'; }
         function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
 
-        // ==========================================
-        // AUTHENTICATION
-        // ==========================================
+        // Auth
         async function doLogin() {
             const username = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPass').value;
@@ -1502,13 +1038,11 @@ v<!DOCTYPE html>
                 showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
                 setTimeout(() => showLoginPage(), 1500);
             } else {
-                showToast('Pendaftaran gagal, coba lagi', 'error', 'regAlert');
+                showToast('Pendaftaran gagal', 'error', 'regAlert');
             }
         }
 
-        // ==========================================
-        // NAVIGATION
-        // ==========================================
+        // Navigation
         function showLoginPage() {
             document.getElementById('app-root').innerHTML = `
                 <div class="login-wrapper">
@@ -1585,9 +1119,6 @@ v<!DOCTYPE html>
             showLoginPage();
         }
 
-        // ==========================================
-        // RENDER DASHBOARD
-        // ==========================================
         function renderDashboard() {
             const firstLetter = currentUser?.username?.charAt(0)?.toUpperCase() || 'A';
             document.getElementById('app-root').innerHTML = `
@@ -1595,7 +1126,7 @@ v<!DOCTYPE html>
                     <div class="sidebar" id="sidebar">
                         <div class="sidebar-header">
                             <h3>Manajemen Mahasiswa</h3>
-                            <button class="toggle-sidebar" onclick="toggleSidebar()" style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer">◀</button>
+                            <button class="toggle-sidebar" onclick="toggleSidebar()">◀</button>
                         </div>
                         <div class="nav-menu">
                             <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></div>
@@ -1633,7 +1164,7 @@ v<!DOCTYPE html>
                             <div class="card">
                                 <div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div>
                                 <p>✨ Data tersimpan di <strong>Google Sheets</strong> via SheetDB | Background dinamis bergerak</p>
-                                <p>✅ <strong>Fitur:</strong> Dark/Light Mode | Show/Hide Password | Sidebar Collapse | Background Animasi | Responsive Design</p>
+                                <p>✅ <strong>Fitur Lengkap:</strong> Tambah | Edit | Hapus | Cari | Urutkan | Dark/Light Mode</p>
                                 <div class="btn-group" style="margin-top:16px">
                                     <button class="btn btn-primary" onclick="switchPage('datamahasiswa')">Kelola Data Mahasiswa</button>
                                     <button class="btn btn-outline" onclick="switchPage('statistik')">Lihat Statistik</button>
@@ -1683,7 +1214,7 @@ v<!DOCTYPE html>
                 
                 <div id="crudModal" class="modal">
                     <div class="modal-content">
-                        <h2 id="modalTitle" style="margin-bottom:16px">Tambah Mahasiswa</h2>
+                        <h2 id="modalTitle">Tambah Mahasiswa</h2>
                         <div id="modalAlert" class="alert"></div>
                         <div class="form-group"><label>NIM (12 digit)</label><input type="text" id="mNim" maxlength="12"><span class="error-text" id="errNim"></span></div>
                         <div class="form-group"><label>Nama Lengkap</label><input type="text" id="mNama"></div>
@@ -1694,7 +1225,7 @@ v<!DOCTYPE html>
                         </div>
                         <div class="form-group"><label>Alamat</label><input type="text" id="mAlamat"></div>
                         <div style="background:var(--bg-input);border-radius:16px;padding:16px;margin:16px 0">
-                            <h4 style="margin-bottom:12px">📊 Nilai Akademik</h4>
+                            <h4>📊 Nilai Akademik</h4>
                             <div class="form-row-4">
                                 <div class="form-group"><label>Absensi</label><input type="number" id="mAbsensi" value="90"></div>
                                 <div class="form-group"><label>Tugas Harian</label><input type="number" id="mTugasHarian" value="80"></div>
@@ -1707,7 +1238,7 @@ v<!DOCTYPE html>
                                 <div class="form-group"><label>Softskill</label><input type="number" id="mSoftskill" value="80"></div>
                             </div>
                         </div>
-                        <div class="btn-group" style="margin-top:16px">
+                        <div class="btn-group">
                             <button class="btn btn-outline" onclick="closeModal()">Batal</button>
                             <button class="btn btn-primary" onclick="saveStudent()">Simpan</button>
                         </div>
@@ -1718,7 +1249,7 @@ v<!DOCTYPE html>
                     <div class="modal-content">
                         <div style="display:flex;justify-content:space-between;margin-bottom:16px">
                             <h3>Detail Mahasiswa</h3>
-                            <button onclick="closeDetailModal()" style="background:none;border:none;font-size:24px;cursor:pointer">&times;</button>
+                            <button onclick="closeDetailModal()">&times;</button>
                         </div>
                         <div id="detailContent"></div>
                     </div>
@@ -1739,9 +1270,6 @@ v<!DOCTYPE html>
             hideLoading();
         }
 
-        // ==========================================
-        // INITIALISASI
-        // ==========================================
         async function init() {
             generateParticles();
             initTheme();
@@ -1760,7 +1288,6 @@ v<!DOCTYPE html>
             }
         }
 
-        // Expose functions ke global
         window.togglePassword = togglePassword;
         window.toggleTheme = toggleTheme;
         window.toggleSidebar = toggleSidebar;
