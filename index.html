@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sistem Manajemen Mahasiswa | Full CRUD Google Sheets</title>
+    <title>Sistem Manajemen Mahasiswa | Full CRUD Working</title>
     <style>
         * {
             margin: 0;
@@ -44,7 +44,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
         .app-layout {
             display: flex;
             min-height: 100vh;
@@ -186,7 +185,6 @@
             cursor: pointer;
         }
 
-        /* Cards */
         .card {
             background: var(--bg-card);
             border-radius: 20px;
@@ -202,7 +200,6 @@
             margin-bottom: 16px;
         }
 
-        /* Stats */
         .stats-main {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -230,7 +227,6 @@
             margin-top: 6px;
         }
 
-        /* Buttons */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -283,7 +279,6 @@
             margin-bottom: 20px;
         }
 
-        /* Search */
         .search-row {
             display: flex;
             gap: 12px;
@@ -299,7 +294,6 @@
             color: var(--text-primary);
         }
 
-        /* Student List */
         .student-item {
             background: var(--bg-card);
             border-radius: 12px;
@@ -340,7 +334,6 @@
         .grade-C { background: rgba(245,158,11,0.2); color: #f59e0b; }
         .grade-D, .grade-E { background: rgba(239,68,68,0.2); color: #ef4444; }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -469,7 +462,6 @@
             display: block;
         }
 
-        /* Login */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
@@ -631,7 +623,6 @@
             }
         }
 
-        // Sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
@@ -644,7 +635,7 @@
         }
 
         // ==========================================
-        // CRUD USERS (Google Sheets)
+        // CRUD USERS
         // ==========================================
         async function loadUsers() {
             try {
@@ -658,19 +649,21 @@
         }
 
         // ==========================================
-        // CRUD MAHASISWA (Google Sheets) - EDIT & DELETE
+        // CRUD MAHASISWA - DENGAN DEBUG LOG
         // ==========================================
         
         async function loadMahasiswa() {
             try {
                 const response = await fetch(SHEETDB_MAHASISWA_API);
-                if (!response.ok) throw new Error();
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 const data = await response.json();
                 students = Array.isArray(data) ? data : [];
+                console.log('Data loaded:', students.length, 'records');
                 renderList();
                 updateStats();
             } catch (error) {
-                showToast('Gagal memuat data', 'error', 'globalAlert');
+                console.error('Load error:', error);
+                showToast('Gagal memuat data: ' + error.message, 'error', 'globalAlert');
                 students = [];
                 renderList();
                 updateStats();
@@ -709,8 +702,10 @@
             showToast('Mahasiswa berhasil ditambahkan!', 'success', 'globalAlert');
         }
 
-        // ========== FUNGSI EDIT MAHASISWA ==========
+        // ========== FUNGSI EDIT MAHASISWA (PAKAI ID) ==========
         async function updateStudent(id, newData) {
+            console.log('Updating student with ID:', id);
+            
             const nilai_akhir = hitungNilaiAkhir(newData);
             const ipk = hitungIPK(nilai_akhir);
             const grade = getGrade(nilai_akhir);
@@ -719,23 +714,25 @@
             const response = await fetch(`${SHEETDB_MAHASISWA_API}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: updatedData })
+                body: JSON.stringify(updatedData)
             });
             
-            if (!response.ok) throw new Error('Gagal mengupdate data');
+            if (!response.ok) throw new Error('Gagal mengupdate data: ' + response.status);
             await loadMahasiswa();
             showToast('Data berhasil diupdate!', 'success', 'globalAlert');
         }
 
-        // ========== FUNGSI HAPUS MAHASISWA ==========
+        // ========== FUNGSI HAPUS MAHASISWA (PAKAI ID) ==========
         async function deleteStudent(id, nim) {
             if (!confirm(`Yakin ingin menghapus data mahasiswa dengan NIM ${nim}?`)) return;
+            
+            console.log('Deleting student with ID:', id);
             
             const response = await fetch(`${SHEETDB_MAHASISWA_API}/${id}`, {
                 method: 'DELETE'
             });
             
-            if (!response.ok) throw new Error('Gagal menghapus data');
+            if (!response.ok) throw new Error('Gagal menghapus data: ' + response.status);
             await loadMahasiswa();
             showToast('Data berhasil dihapus!', 'success', 'globalAlert');
         }
@@ -860,7 +857,10 @@
 
         function editStudent(id, nim) {
             const s = students.find(x => x.id == id);
-            if (!s) return;
+            if (!s) {
+                showToast('Data tidak ditemukan!', 'error', 'globalAlert');
+                return;
+            }
             isEdit = true;
             editTargetId = id;
             document.getElementById('modalTitle').innerText = 'Edit Mahasiswa';
@@ -1199,7 +1199,6 @@
             }
         }
 
-        // Expose functions
         window.toggleTheme = toggleTheme;
         window.toggleSidebar = toggleSidebar;
         window.mobileToggleSidebar = mobileToggleSidebar;
