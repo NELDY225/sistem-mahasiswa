@@ -536,17 +536,18 @@
         // ==========================================
         // GANTI DENGAN API ENDPOINT DARI SHEETDB ANDA!
         // Dapatkan dari: https://sheetdb.io setelah menghubungkan Google Sheets
-        const SHEETDB_API = 'https://sheetdb.io/api/v1/4j3m9vu7ylh6g';
+        const SHEETDB_API = 'https://sheetdb.io/api/v1/YOUR_API_KEY_HERE';
         
+        // Endpoint khusus untuk sheet users (gunakan query parameter sheet)
+        const SHEETDB_USERS_API = SHEETDB_API + '?sheet=users';
+        const SHEETDB_MAHASISWA_API = SHEETDB_API + '?sheet=mahasiswa';
+
         // ==========================================
-        // DATA USERS (Lokal untuk login - bisa dikembangkan)
+        // DATA USERS (Disimpan di Google Sheets)
         // ==========================================
-        let users = [
-            { username: "admin", password: "admin123" }
-        ];
-        
         let currentUser = null;
         let students = [];
+        let users = [];
         let editTargetNim = null;
         let isEdit = false;
         let currentMethod = "sequential";
@@ -636,12 +637,52 @@
         }
 
         // ==========================================
-        // FUNGSI CRUD DENGAN SHEETDB
+        // FUNGSI CRUD USERS DENGAN GOOGLE SHEETS
+        // ==========================================
+        
+        async function loadUsers() {
+            try {
+                const response = await fetch(SHEETDB_USERS_API);
+                if (!response.ok) throw new Error('Gagal memuat data users');
+                const data = await response.json();
+                users = Array.isArray(data) ? data : [];
+                console.log('Users loaded:', users.length);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                // Data default jika gagal load
+                users = [{ username: "admin", password: "admin123", created_at: new Date().toISOString() }];
+            }
+        }
+
+        async function addUserToSheet(username, password) {
+            try {
+                const newUser = {
+                    username: username,
+                    password: password,
+                    created_at: new Date().toISOString()
+                };
+                
+                const response = await fetch(SHEETDB_USERS_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: newUser })
+                });
+                
+                if (!response.ok) throw new Error('Gagal menambahkan user');
+                return true;
+            } catch (error) {
+                console.error('Error adding user:', error);
+                return false;
+            }
+        }
+
+        // ==========================================
+        // FUNGSI CRUD MAHASISWA DENGAN GOOGLE SHEETS
         // ==========================================
         
         async function loadMahasiswa() {
             try {
-                const response = await fetch(SHEETDB_API);
+                const response = await fetch(SHEETDB_MAHASISWA_API);
                 if (!response.ok) throw new Error('Gagal memuat data');
                 const data = await response.json();
                 students = Array.isArray(data) ? data : [];
@@ -684,7 +725,7 @@
             
             const newData = { ...data, nilai_akhir, ipk, grade };
             
-            const response = await fetch(SHEETDB_API, {
+            const response = await fetch(SHEETDB_MAHASISWA_API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: newData })
@@ -703,7 +744,8 @@
             
             const updatedData = { ...newData, nilai_akhir, ipk, grade };
             
-            const response = await fetch(`${SHEETDB_API}/nim/${oldNim}`, {
+            // Cari berdasarkan NIM
+            const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${oldNim}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: updatedData })
@@ -718,7 +760,7 @@
         async function deleteStudent(nim) {
             if (!confirm('Yakin ingin menghapus data ini?')) return;
             
-            const response = await fetch(`${SHEETDB_API}/nim/${nim}`, {
+            const response = await fetch(`${SHEETDB_MAHASISWA_API}/nim/${nim}`, {
                 method: 'DELETE'
             });
             
@@ -929,11 +971,16 @@
         function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
 
         // ==========================================
-        // AUTHENTICATION
+        // AUTHENTICATION DENGAN GOOGLE SHEETS
         // ==========================================
-        function doLogin() {
+        
+        async function doLogin() {
             const username = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPass').value;
+            
+            // Load users dari Google Sheets
+            await loadUsers();
+            
             const user = users.find(u => u.username === username && u.password === password);
             if (!user) {
                 showToast('Username atau password salah!', 'error', 'loginAlert');
@@ -944,10 +991,11 @@
             renderDashboard();
         }
 
-        function doRegister() {
+        async function doRegister() {
             const username = document.getElementById('regUser').value.trim();
             const password = document.getElementById('regPass').value;
             const confirm = document.getElementById('regConfirm').value;
+            
             if (username.length < 3) {
                 showToast('Username minimal 3 karakter', 'error', 'regAlert');
                 return;
@@ -960,13 +1008,25 @@
                 showToast('Konfirmasi password tidak cocok', 'error', 'regAlert');
                 return;
             }
+            
+            // Load users terlebih dahulu
+            await loadUsers();
+            
+            // Cek apakah username sudah ada
             if (users.find(u => u.username === username)) {
                 showToast('Username sudah terdaftar!', 'error', 'regAlert');
                 return;
             }
-            users.push({ username, password });
-            showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
-            setTimeout(() => showLoginPage(), 1500);
+            
+            // Tambahkan user ke Google Sheets
+            const success = await addUserToSheet(username, password);
+            
+            if (success) {
+                showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
+                setTimeout(() => showLoginPage(), 1500);
+            } else {
+                showToast('Pendaftaran gagal, coba lagi', 'error', 'regAlert');
+            }
         }
 
         // ==========================================
@@ -1086,6 +1146,7 @@
                             <div class="card">
                                 <div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div>
                                 <p>Data tersimpan di <strong>Google Sheets</strong> via SheetDB. Semua perubahan akan langsung tersimpan di Google Drive Anda.</p>
+                                <p><strong>✅ Users juga tersimpan di Google Sheets!</strong> (sheet "users")</p>
                                 <div class="btn-group" style="margin-top:16px">
                                     <button class="btn btn-primary" onclick="switchPage('datamahasiswa')">Kelola Data Mahasiswa</button>
                                     <button class="btn btn-outline" onclick="switchPage('statistik')">Lihat Statistik</button>
@@ -1196,13 +1257,22 @@
         // ==========================================
         // INITIALISASI
         // ==========================================
-        function init() {
+        async function init() {
             initTheme();
+            // Load users dari Google Sheets untuk cache
+            await loadUsers();
+            
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
-                    renderDashboard();
+                    // Verifikasi user masih ada di database
+                    const userExists = users.find(u => u.username === currentUser.username);
+                    if (userExists) {
+                        renderDashboard();
+                    } else {
+                        showLoginPage();
+                    }
                 } catch(e) { showLoginPage(); }
             } else {
                 showLoginPage();
@@ -1230,7 +1300,6 @@
         window.sortByIpk = sortByIpk;
         window.sortByNilai = sortByNilai;
         window.toggleTheme = toggleTheme;
-        window.toggleSidebar = toggleSidebar;
 
         init();
     </script>
