@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sistem Manajemen Mahasiswa | Nilai Lengkap</title>
+    <title>Sistem Manajemen Mahasiswa | Google Sheets Database</title>
     <style>
         * {
             margin: 0;
@@ -11,64 +11,45 @@
             box-sizing: border-box;
         }
 
-        /* Tema Default (Light) */
         :root {
             --bg-primary: #f5f7fa;
-            --bg-secondary: #ffffff;
             --bg-card: #ffffff;
-            --bg-card-hover: #f8fafc;
             --bg-input: #f1f5f9;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
-            --text-muted: #94a3b8;
             --border: #e2e8f0;
             --primary: #6366f1;
             --primary-dark: #4f46e5;
-            --primary-glow: rgba(99, 102, 241, 0.15);
-            --success: #10b981;
             --danger: #ef4444;
+            --success: #10b981;
             --warning: #f59e0b;
-            --info: #3b82f6;
-            --sidebar-width: 280px;
-            --sidebar-collapsed: 70px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 260px;
         }
 
-        /* Tema Gelap (Dark) */
         body.dark {
             --bg-primary: #0a0a0a;
-            --bg-secondary: #0f0f0f;
             --bg-card: #1a1a1a;
-            --bg-card-hover: #222222;
             --bg-input: #252525;
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
-            --text-muted: #6b6b6b;
             --border: #2a2a2a;
             --primary: #818cf8;
-            --primary-dark: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.2);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
+            transition: all 0.3s;
             min-height: 100vh;
-            overflow-x: hidden;
-            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* Layout */
+        /* Sidebar */
         .app-layout {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             left: 0;
@@ -77,23 +58,16 @@
             height: 100vh;
             background: var(--bg-card);
             border-right: 1px solid var(--border);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             z-index: 100;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
         }
 
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed);
-        }
-
         .sidebar-header {
-            padding: 24px 20px;
+            padding: 20px;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
         .sidebar-header h3 {
@@ -103,31 +77,11 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            white-space: nowrap;
-        }
-
-        .sidebar.collapsed .sidebar-header h3 {
-            display: none;
-        }
-
-        .toggle-sidebar {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-        }
-
-        .toggle-sidebar:hover {
-            background: var(--primary);
-            color: white;
         }
 
         .nav-menu {
             flex: 1;
-            padding: 20px 12px;
+            padding: 16px 12px;
         }
 
         .nav-item {
@@ -135,41 +89,20 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
             color: var(--text-secondary);
         }
 
-        .nav-item:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        .nav-item:hover, .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
 
-        .nav-icon {
-            font-size: 20px;
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .nav-label {
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .sidebar.collapsed .nav-label {
-            display: none;
-        }
-
         .sidebar-footer {
-            padding: 20px;
+            padding: 16px;
             border-top: 1px solid var(--border);
         }
 
@@ -182,58 +115,33 @@
         .user-avatar-small {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), #a855f7);
             border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 16px;
+            color: white;
         }
 
-        .sidebar.collapsed .user-details {
-            display: none;
-        }
-
-        .user-details {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .user-role {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            transition: all 0.3s ease;
             padding: 24px;
             min-height: 100vh;
         }
 
-        .main-content.expanded {
-            margin-left: var(--sidebar-collapsed);
-        }
-
-        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 16px;
         }
 
         .page-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             background: linear-gradient(135deg, var(--text-primary), var(--primary));
             -webkit-background-clip: text;
@@ -247,37 +155,26 @@
             align-items: center;
         }
 
-        .theme-toggle-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 8px 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
         .user-badge {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), #a855f7);
             border-radius: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             font-size: 18px;
+            color: white;
+        }
+
+        .theme-toggle-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
         }
 
         .mobile-menu-btn {
@@ -287,92 +184,48 @@
             border-radius: 10px;
             padding: 10px 14px;
             cursor: pointer;
-            font-size: 18px;
-            color: var(--text-primary);
         }
 
         /* Cards */
         .card {
             background: var(--bg-card);
             border-radius: 20px;
-            padding: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .card-header {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            margin-bottom: 16px;
         }
 
         /* Stats */
         .stats-main {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 20px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
             background: var(--bg-card);
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 16px;
             text-align: center;
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-        }
-
-        .stat-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
         }
 
         .stat-number {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--primary);
         }
 
         .stat-label {
             font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 8px;
-        }
-
-        .stats-nilai {
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-            border-radius: 20px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
-        }
-
-        .nilai-item {
-            text-align: center;
-        }
-
-        .nilai-angka {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .nilai-label {
-            font-size: 11px;
             color: var(--text-secondary);
             margin-top: 6px;
         }
@@ -385,21 +238,21 @@
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
             background: var(--bg-input);
             color: var(--text-primary);
             border: 1px solid var(--border);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--primary-glow);
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
         }
 
         .btn-danger {
@@ -419,7 +272,7 @@
         }
 
         .btn-sm {
-            padding: 6px 14px;
+            padding: 6px 12px;
             font-size: 12px;
         }
 
@@ -427,84 +280,32 @@
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
 
         /* Search */
-        .method-group {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .method-btn {
-            flex: 1;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-        }
-
-        .method-btn.active {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-color: transparent;
-        }
-
         .search-row {
             display: flex;
             gap: 12px;
-            margin: 16px 0;
+            margin-top: 16px;
         }
 
         .search-row input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 12px;
             background: var(--bg-input);
             border: 1px solid var(--border);
             border-radius: 40px;
-            font-size: 14px;
             color: var(--text-primary);
-            transition: all 0.2s;
         }
 
-        .search-row input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-        }
-
-        .result-box {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 16px;
-            margin-top: 16px;
-            border-left: 3px solid var(--primary);
-        }
-
-        /* Student Item */
+        /* Student List */
         .student-item {
             background: var(--bg-card);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
             border: 1px solid var(--border);
-            transition: all 0.2s;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-        }
-
-        .student-item:hover {
-            border-color: var(--primary);
-            background: var(--bg-card-hover);
-            transform: translateX(4px);
         }
 
         .student-row {
@@ -517,87 +318,28 @@
 
         .student-name {
             font-weight: 700;
-            font-size: 16px;
             color: var(--primary);
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .student-name:hover {
-            text-decoration: underline;
-            color: #a855f7;
         }
 
         .grade-badge {
-            display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
-            font-weight: 700;
             font-size: 11px;
-        }
-
-        .grade-A { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .grade-B { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .grade-C { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .grade-D { background: rgba(249, 115, 22, 0.2); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
-        .grade-E { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-        .ipk-text {
             font-weight: 700;
-            color: var(--success);
         }
 
-        /* Form Section */
-        .form-section {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-
-        .form-section-title {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--primary);
-            display: inline-block;
-        }
-
-        /* Password Wrapper */
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-wrapper input {
-            width: 100%;
-            padding: 12px 45px 12px 16px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 8px;
-            color: var(--text-secondary);
-        }
+        .grade-A { background: rgba(16,185,129,0.2); color: #10b981; }
+        .grade-B { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .grade-C { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .grade-D, .grade-E { background: rgba(239,68,68,0.2); color: #ef4444; }
 
         /* Modal */
         .modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
@@ -608,12 +350,11 @@
         .modal-content {
             background: var(--bg-card);
             border-radius: 24px;
-            padding: 28px;
-            max-width: 700px;
+            padding: 24px;
+            max-width: 650px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
-            border: 1px solid var(--border);
         }
 
         .form-group {
@@ -621,14 +362,14 @@
         }
 
         .form-group label {
+            display: block;
             font-size: 12px;
             font-weight: 600;
-            display: block;
             margin-bottom: 6px;
             color: var(--text-secondary);
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 12px;
             background: var(--bg-input);
@@ -638,90 +379,80 @@
             font-size: 13px;
         }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 12px;
         }
 
         .form-row-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
+            gap: 12px;
         }
 
         .form-row-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
+            gap: 12px;
         }
 
         .error-text {
             color: var(--danger);
-            font-size: 10px;
-            margin-top: 6px;
+            font-size: 11px;
+            margin-top: 4px;
             display: block;
         }
 
         .alert {
-            padding: 12px 16px;
+            padding: 12px;
             border-radius: 12px;
-            font-size: 13px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             display: none;
+            font-size: 13px;
         }
 
-        .alert-success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .alert-error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .alert-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .alert-info { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .alert-success {
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+
+        .alert-error {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
 
         .empty {
             text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
+            padding: 40px;
+            color: var(--text-secondary);
         }
 
         .detail-row {
             display: flex;
-            margin-bottom: 14px;
-            padding: 10px 0;
+            margin-bottom: 12px;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border);
         }
 
         .detail-label {
-            width: 120px;
+            width: 100px;
             font-weight: 600;
             color: var(--text-secondary);
-            font-size: 13px;
         }
 
         .detail-value {
             flex: 1;
-            font-size: 14px;
-            color: var(--text-primary);
         }
 
-        .close-detail {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-secondary);
-        }
-
-        .close-detail:hover {
-            color: var(--danger);
-        }
-
-        .action-icons {
-            display: flex;
-            gap: 8px;
+        .bobot-info {
+            background: rgba(99,102,241,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 11px;
         }
 
         .page-content {
@@ -732,188 +463,110 @@
             display: block;
         }
 
-        .settings-group {
-            margin-bottom: 24px;
-        }
-
-        .settings-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
         /* Login */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
         }
 
         .login-card {
-            background: var(--bg-card);
+            background: white;
             border-radius: 32px;
             padding: 40px;
             max-width: 420px;
             width: 100%;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
 
-        .login-logo {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .login-logo .icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 32px;
+        body.dark .login-card {
+            background: #1a1a1a;
         }
 
         .login-card h2 {
             text-align: center;
-            font-size: 24px;
-            font-weight: 700;
             margin-bottom: 8px;
         }
 
-        .login-subtitle {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 28px;
-        }
-
         .demo-info {
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 12px;
-            padding: 12px;
             margin-top: 20px;
+            padding: 12px;
+            background: rgba(99,102,241,0.1);
+            border-radius: 12px;
             text-align: center;
+            font-size: 12px;
         }
 
-        .demo-info .demo-badge {
+        .demo-badge {
             display: inline-flex;
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
+            margin-top: 8px;
         }
 
-        .demo-info .demo-badge span {
+        .demo-badge span {
             background: var(--bg-input);
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 11px;
             font-family: monospace;
-            color: var(--primary);
-        }
-
-        /* Bobot Info */
-        .bobot-info {
-            background: rgba(99, 102, 241, 0.08);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 12px;
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .bobot-info span {
-            color: var(--primary);
-            font-weight: 600;
         }
 
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { transform: translateX(-100%); position: fixed; }
             .sidebar.mobile-open { transform: translateX(0); }
             .main-content { margin-left: 0; }
+            .mobile-menu-btn { display: block; }
             .form-row, .form-row-3, .form-row-4 { grid-template-columns: 1fr; gap: 10px; }
             .student-row { flex-direction: column; align-items: flex-start; }
-            .mobile-menu-btn { display: block; }
             .stats-main { grid-template-columns: repeat(2, 1fr); }
-            .theme-toggle-btn span:not(.theme-icon) { display: none; }
-            .theme-toggle-btn { padding: 8px 12px; }
-            .detail-label { width: 100px; }
-        }
-
-        @media (min-width: 769px) {
-            .mobile-menu-btn { display: none; }
         }
     </style>
 </head>
 <body>
-    <div id="app-root"></div>
+    <div id="app-root">Loading...</div>
 
     <script>
-        // ======================= DATA STORAGE =======================
-        let users = [];
-        let students = [];
+        // ==========================================
+        // 🔧 KONFIGURASI SHEETDB.IO
+        // ==========================================
+        // GANTI DENGAN API ENDPOINT DARI SHEETDB ANDA!
+        // Dapatkan dari: https://sheetdb.io setelah menghubungkan Google Sheets
+        const SHEETDB_API = 'https://sheetdb.io/api/v1/4j3m9vu7ylh6g';
+        
+        // ==========================================
+        // DATA USERS (Lokal untuk login - bisa dikembangkan)
+        // ==========================================
+        let users = [
+            { username: "admin", password: "admin123" }
+        ];
+        
         let currentUser = null;
-        let currentMethod = "sequential";
+        let students = [];
         let editTargetNim = null;
         let isEdit = false;
+        let currentMethod = "sequential";
 
-        // Bobot penilaian (dalam persen)
+        // ==========================================
+        // BOBOT PENILAIAN
+        // ==========================================
         const BOBOT = {
-            absensi: 0.05,      // 5%
-            tugasHarian: 0.10,  // 10%
-            praktikum: 0.15,    // 15%
-            uts: 0.20,          // 20%
-            uas: 0.25,          // 25%
-            proyek: 0.15,       // 15%
-            softskill: 0.10     // 10%
+            absensi: 0.05,
+            tugasHarian: 0.10,
+            praktikum: 0.15,
+            uts: 0.20,
+            uas: 0.25,
+            proyek: 0.15,
+            softskill: 0.10
         };
 
-        // Theme handling
-        function initTheme() {
-            const savedTheme = localStorage.getItem('app_theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark');
-            } else if (savedTheme === 'light') {
-                document.body.classList.remove('dark');
-            } else {
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.body.classList.add('dark');
-                    localStorage.setItem('app_theme', 'dark');
-                } else {
-                    document.body.classList.remove('dark');
-                    localStorage.setItem('app_theme', 'light');
-                }
-            }
-            updateThemeButton();
-        }
-
-        function toggleTheme() {
-            if (document.body.classList.contains('dark')) {
-                document.body.classList.remove('dark');
-                localStorage.setItem('app_theme', 'light');
-            } else {
-                document.body.classList.add('dark');
-                localStorage.setItem('app_theme', 'dark');
-            }
-            updateThemeButton();
-        }
-
-        function updateThemeButton() {
-            const themeBtn = document.getElementById('themeToggleBtn');
-            if (themeBtn) {
-                const isDark = document.body.classList.contains('dark');
-                themeBtn.innerHTML = isDark ? '<span class="theme-icon">☀️</span><span>Mode Terang</span>' : '<span class="theme-icon">🌙</span><span>Mode Gelap</span>';
-            }
-        }
-
-        // Hitung Nilai Akhir berdasarkan semua komponen
+        // ==========================================
+        // FUNGSI BANTUAN
+        // ==========================================
         function hitungNilaiAkhir(data) {
             let nilai = 0;
             nilai += (data.absensi || 0) * BOBOT.absensi;
@@ -947,59 +600,6 @@
             return 0.0;
         }
 
-        function loadData() {
-            const storedUsers = localStorage.getItem("app_users_final_v6");
-            const storedStudents = localStorage.getItem("app_students_final_v6");
-            
-            users = storedUsers ? JSON.parse(storedUsers) : [
-                { username: "admin", password: "admin123", created_at: new Date().toISOString() }
-            ];
-            
-            if (storedStudents) {
-                students = JSON.parse(storedStudents);
-            } else {
-                students = [
-                    { nim: "202311001234", nama: "Andi Saputra", email: "andi@univ.ac.id", hp: "081234567890", alamat: "Jl. Merdeka No.1", jurusan: "Teknik Informatika", 
-                      absensi: 95, tugasHarian: 85, praktikum: 88, uts: 80, uas: 90, proyek: 85, softskill: 82 },
-                    { nim: "202311005678", nama: "Budi Santoso", email: "budi@univ.ac.id", hp: "082345678901", alamat: "Jl. Sudirman No.5", jurusan: "Sistem Informasi",
-                      absensi: 88, tugasHarian: 78, praktikum: 80, uts: 75, uas: 82, proyek: 80, softskill: 78 },
-                    { nim: "202311009012", nama: "Citra Dewi", email: "citra@univ.ac.id", hp: "083456789012", alamat: "Jl. Diponegoro No.10", jurusan: "Teknik Komputer",
-                      absensi: 98, tugasHarian: 92, praktikum: 95, uts: 88, uas: 94, proyek: 90, softskill: 88 },
-                    { nim: "202311003456", nama: "Dian Pratama", email: "dian@univ.ac.id", hp: "084567890123", alamat: "Jl. Thamrin No.8", jurusan: "Teknik Elektro",
-                      absensi: 75, tugasHarian: 65, praktikum: 70, uts: 60, uas: 68, proyek: 72, softskill: 70 },
-                    { nim: "202311007890", nama: "Eka Wahyuni", email: "eka@univ.ac.id", hp: "085678901234", alamat: "Jl. Pahlawan No.3", jurusan: "Manajemen Informatika",
-                      absensi: 92, tugasHarian: 86, praktikum: 85, uts: 84, uas: 88, proyek: 87, softskill: 85 }
-                ];
-                students.forEach(s => {
-                    s.nilaiAkhir = hitungNilaiAkhir(s);
-                    s.ipk = hitungIPK(s.nilaiAkhir);
-                    s.grade = getGrade(s.nilaiAkhir);
-                });
-            }
-            students.forEach(s => {
-                if (s.nilaiAkhir === undefined) s.nilaiAkhir = hitungNilaiAkhir(s);
-                if (s.ipk === undefined) s.ipk = hitungIPK(s.nilaiAkhir);
-                if (s.grade === undefined) s.grade = getGrade(s.nilaiAkhir);
-            });
-            saveToStorage();
-        }
-
-        function saveToStorage() {
-            localStorage.setItem("app_users_final_v6", JSON.stringify(users));
-            localStorage.setItem("app_students_final_v6", JSON.stringify(students));
-        }
-
-        function togglePassword(inputId, btn) {
-            const input = document.getElementById(inputId);
-            if (input.type === "password") {
-                input.type = "text";
-                btn.innerHTML = "🙈";
-            } else {
-                input.type = "password";
-                btn.innerHTML = "👁";
-            }
-        }
-
         function showToast(msg, type, alertId) {
             const el = document.getElementById(alertId);
             if (el) {
@@ -1015,33 +615,148 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
 
-        // Render list
+        // Theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('app_theme');
+            if (savedTheme === 'dark') document.body.classList.add('dark');
+            updateThemeButton();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('app_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeButton();
+        }
+
+        function updateThemeButton() {
+            const btn = document.getElementById('themeToggleBtn');
+            if (btn) {
+                btn.innerHTML = document.body.classList.contains('dark') ? '☀️ Mode Terang' : '🌙 Mode Gelap';
+            }
+        }
+
+        // ==========================================
+        // FUNGSI CRUD DENGAN SHEETDB
+        // ==========================================
+        
+        async function loadMahasiswa() {
+            try {
+                const response = await fetch(SHEETDB_API);
+                if (!response.ok) throw new Error('Gagal memuat data');
+                const data = await response.json();
+                students = Array.isArray(data) ? data : [];
+                renderList();
+                updateStats();
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Gagal memuat data dari database', 'error', 'globalAlert');
+                students = [];
+                renderList();
+                updateStats();
+            }
+        }
+
+        async function updateStats() {
+            const total = students.length;
+            const avgIpk = total ? (students.reduce((s, m) => s + (parseFloat(m.ipk) || 0), 0) / total).toFixed(2) : 0;
+            const avgNa = total ? (students.reduce((s, m) => s + (parseFloat(m.nilai_akhir) || 0), 0) / total).toFixed(1) : 0;
+            const gradeACount = students.filter(s => s.grade === 'A').length;
+            
+            document.getElementById('totalMhs') && (document.getElementById('totalMhs').innerText = total);
+            document.getElementById('avgIpk') && (document.getElementById('avgIpk').innerText = avgIpk);
+            document.getElementById('avgNilai') && (document.getElementById('avgNilai').innerText = avgNa);
+            document.getElementById('gradeCount') && (document.getElementById('gradeCount').innerText = gradeACount);
+            
+            document.getElementById('statTotalMhs') && (document.getElementById('statTotalMhs').innerText = total);
+            document.getElementById('statRataIpk') && (document.getElementById('statRataIpk').innerText = avgIpk);
+            document.getElementById('statRataNilai') && (document.getElementById('statRataNilai').innerText = avgNa);
+            document.getElementById('statGradeA') && (document.getElementById('statGradeA').innerText = gradeACount);
+        }
+
+        async function addStudent(data) {
+            if (!/^\d{12}$/.test(data.nim)) throw new Error('NIM harus 12 digit angka');
+            if (data.nama.trim().length < 3) throw new Error('Nama minimal 3 huruf');
+            if (students.find(s => s.nim === data.nim)) throw new Error('NIM sudah terdaftar');
+            
+            const nilai_akhir = hitungNilaiAkhir(data);
+            const ipk = hitungIPK(nilai_akhir);
+            const grade = getGrade(nilai_akhir);
+            
+            const newData = { ...data, nilai_akhir, ipk, grade };
+            
+            const response = await fetch(SHEETDB_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: newData })
+            });
+            
+            if (!response.ok) throw new Error('Gagal menambahkan data');
+            
+            await loadMahasiswa();
+            showToast('Mahasiswa berhasil ditambahkan!', 'success', 'globalAlert');
+        }
+
+        async function updateStudent(oldNim, newData) {
+            const nilai_akhir = hitungNilaiAkhir(newData);
+            const ipk = hitungIPK(nilai_akhir);
+            const grade = getGrade(nilai_akhir);
+            
+            const updatedData = { ...newData, nilai_akhir, ipk, grade };
+            
+            const response = await fetch(`${SHEETDB_API}/nim/${oldNim}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: updatedData })
+            });
+            
+            if (!response.ok) throw new Error('Gagal mengupdate data');
+            
+            await loadMahasiswa();
+            showToast('Data berhasil diupdate!', 'success', 'globalAlert');
+        }
+
+        async function deleteStudent(nim) {
+            if (!confirm('Yakin ingin menghapus data ini?')) return;
+            
+            const response = await fetch(`${SHEETDB_API}/nim/${nim}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) throw new Error('Gagal menghapus data');
+            
+            await loadMahasiswa();
+            showToast('Data berhasil dihapus!', 'success', 'globalAlert');
+        }
+
+        // ==========================================
+        // RENDER FUNCTIONS
+        // ==========================================
         function renderList() {
-            const container = document.getElementById("studentList");
+            const container = document.getElementById('studentList');
             if (!container) return;
             if (students.length === 0) {
-                container.innerHTML = '<div class="empty">Belum ada data mahasiswa. Klik "Tambah Mahasiswa" untuk menambahkan.</div>';
+                container.innerHTML = '<div class="empty">📭 Belum ada data mahasiswa. Klik "Tambah Mahasiswa" untuk menambahkan.</div>';
                 return;
             }
-            container.innerHTML = "";
+            container.innerHTML = '';
             students.forEach(s => {
                 const gradeClass = `grade-${s.grade}`;
-                const div = document.createElement("div");
-                div.className = "student-item";
+                const div = document.createElement('div');
+                div.className = 'student-item';
                 div.innerHTML = `
                     <div class="student-row">
                         <div>
-                            <div class="student-name" onclick="window.showDetail('${s.nim}')">${escapeHtml(s.nama)}</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">NIM: ${s.nim}</div>
+                            <div class="student-name" onclick="showDetail('${s.nim}')">${escapeHtml(s.nama)}</div>
+                            <div style="font-size:11px; color:var(--text-secondary)">NIM: ${s.nim}</div>
                         </div>
-                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
                             <span class="grade-badge ${gradeClass}">Grade ${s.grade}</span>
-                            <span class="ipk-text">IPK ${s.ipk.toFixed(2)}</span>
-                            <span style="font-size: 12px; color: var(--text-secondary);">Nilai Akhir: ${s.nilaiAkhir.toFixed(1)}</span>
+                            <span>IPK ${parseFloat(s.ipk || 0).toFixed(2)}</span>
+                            <span>Nilai: ${parseFloat(s.nilai_akhir || 0).toFixed(1)}</span>
                         </div>
-                        <div class="action-icons">
-                            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); window.editStudent('${s.nim}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); window.hapusConfirm('${s.nim}')">Hapus</button>
+                        <div style="display:flex; gap:8px">
+                            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editStudent('${s.nim}')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteStudent('${s.nim}')">Hapus</button>
                         </div>
                     </div>
                 `;
@@ -1049,217 +764,90 @@
             });
         }
 
-        function updateAllStats() {
-            const total = students.length;
-            const avgIpk = total ? (students.reduce((s, m) => s + m.ipk, 0) / total).toFixed(2) : 0;
-            const avgNa = total ? (students.reduce((s, m) => s + m.nilaiAkhir, 0) / total).toFixed(1) : 0;
-            const gradeACount = students.filter(s => s.grade === 'A').length;
-            const avgAbsensi = total ? (students.reduce((s, m) => s + (m.absensi || 0), 0) / total).toFixed(1) : 0;
-            const avgTugas = total ? (students.reduce((s, m) => s + (m.tugasHarian || 0), 0) / total).toFixed(1) : 0;
-            const avgPraktikum = total ? (students.reduce((s, m) => s + (m.praktikum || 0), 0) / total).toFixed(1) : 0;
-            const avgUts = total ? (students.reduce((s, m) => s + (m.uts || 0), 0) / total).toFixed(1) : 0;
-            const avgUas = total ? (students.reduce((s, m) => s + (m.uas || 0), 0) / total).toFixed(1) : 0;
-            const avgProyek = total ? (students.reduce((s, m) => s + (m.proyek || 0), 0) / total).toFixed(1) : 0;
-            const avgSoftskill = total ? (students.reduce((s, m) => s + (m.softskill || 0), 0) / total).toFixed(1) : 0;
-            const maxN = total ? Math.max(...students.map(s => s.nilaiAkhir)).toFixed(1) : 0;
-            const minN = total ? Math.min(...students.map(s => s.nilaiAkhir)).toFixed(1) : 0;
+        function showDetail(nim) {
+            const s = students.find(x => x.nim === nim);
+            if (!s) return;
+            const gradeClass = `grade-${s.grade}`;
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-row"><div class="detail-label">NIM</div><div class="detail-value">${s.nim}</div></div>
+                <div class="detail-row"><div class="detail-label">Nama</div><div class="detail-value">${escapeHtml(s.nama)}</div></div>
+                <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(s.email)}</div></div>
+                <div class="detail-row"><div class="detail-label">No. HP</div><div class="detail-value">${s.hp || '-'}</div></div>
+                <div class="detail-row"><div class="detail-label">Jurusan</div><div class="detail-value">${escapeHtml(s.jurusan)}</div></div>
+                <div class="detail-row"><div class="detail-label">Alamat</div><div class="detail-value">${escapeHtml(s.alamat) || '-'}</div></div>
+                <div class="detail-row"><div class="detail-label">Grade / IPK</div><div class="detail-value"><span class="grade-badge ${gradeClass}">Grade ${s.grade}</span> | IPK ${parseFloat(s.ipk || 0).toFixed(2)}</div></div>
+                <div style="background:var(--bg-input); border-radius:12px; padding:12px; margin-top:12px">
+                    <strong>📊 Nilai Akademik:</strong><br>
+                    Absensi: ${s.absensi || 0} | Tugas: ${s.tugas_harian || 0}<br>
+                    Praktikum: ${s.praktikum || 0} | UTS: ${s.uts || 0}<br>
+                    UAS: ${s.uas || 0} | Proyek: ${s.proyek || 0}<br>
+                    Softskill: ${s.softskill || 0}<br>
+                    <strong>🎯 Nilai Akhir: ${parseFloat(s.nilai_akhir || 0).toFixed(2)}</strong>
+                </div>
+                <div class="bobot-info">
+                    <strong>Bobot Penilaian:</strong> Absensi 5% | Tugas 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%
+                </div>
+            `;
+            document.getElementById('detailModal').style.display = 'flex';
+        }
 
-            const elements = ["totalMhs", "statTotalMhs"];
-            elements.forEach(id => { const el = document.getElementById(id); if (el) el.innerText = total; });
-            ["avgIpk", "statRataIpk"].forEach(id => { const el = document.getElementById(id); if (el) el.innerText = avgIpk; });
-            ["avgNilaiAkhir", "statRataNilai"].forEach(id => { const el = document.getElementById(id); if (el) el.innerText = avgNa; });
-            ["gradeCount", "statGradeA"].forEach(id => { const el = document.getElementById(id); if (el) el.innerText = gradeACount; });
-
-            document.getElementById("avgAbsensi") && (document.getElementById("avgAbsensi").innerText = avgAbsensi);
-            document.getElementById("avgTugasHarian") && (document.getElementById("avgTugasHarian").innerText = avgTugas);
-            document.getElementById("avgPraktikum") && (document.getElementById("avgPraktikum").innerText = avgPraktikum);
-            document.getElementById("avgUTS") && (document.getElementById("avgUTS").innerText = avgUts);
-            document.getElementById("avgUAS") && (document.getElementById("avgUAS").innerText = avgUas);
-            document.getElementById("avgProyek") && (document.getElementById("avgProyek").innerText = avgProyek);
-            document.getElementById("avgSoftskill") && (document.getElementById("avgSoftskill").innerText = avgSoftskill);
-            document.getElementById("nilaiTertinggi") && (document.getElementById("nilaiTertinggi").innerText = maxN);
-            document.getElementById("nilaiTerendah") && (document.getElementById("nilaiTerendah").innerText = minN);
-
-            document.getElementById("statAbsensi") && (document.getElementById("statAbsensi").innerText = avgAbsensi);
-            document.getElementById("statTugasHarian") && (document.getElementById("statTugasHarian").innerText = avgTugas);
-            document.getElementById("statPraktikum") && (document.getElementById("statPraktikum").innerText = avgPraktikum);
-            document.getElementById("statUTS") && (document.getElementById("statUTS").innerText = avgUts);
-            document.getElementById("statUAS") && (document.getElementById("statUAS").innerText = avgUas);
-            document.getElementById("statProyek") && (document.getElementById("statProyek").innerText = avgProyek);
-            document.getElementById("statSoftskill") && (document.getElementById("statSoftskill").innerText = avgSoftskill);
-            document.getElementById("statMax") && (document.getElementById("statMax").innerText = maxN);
-            document.getElementById("statMin") && (document.getElementById("statMin").innerText = minN);
-
-            const grades = { A: 0, B: 0, C: 0, D: 0, E: 0 };
-            students.forEach(s => grades[s.grade]++);
-            const gradeDist = document.getElementById("gradeDistribution");
-            if (gradeDist) {
-                gradeDist.innerHTML = `
-                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; text-align: center;">
-                        <div><span class="grade-badge grade-A">Grade A</span><div style="font-size: 24px; font-weight: 700; margin-top: 8px;">${grades.A}</div></div>
-                        <div><span class="grade-badge grade-B">Grade B</span><div style="font-size: 24px; font-weight: 700; margin-top: 8px;">${grades.B}</div></div>
-                        <div><span class="grade-badge grade-C">Grade C</span><div style="font-size: 24px; font-weight: 700; margin-top: 8px;">${grades.C}</div></div>
-                        <div><span class="grade-badge grade-D">Grade D</span><div style="font-size: 24px; font-weight: 700; margin-top: 8px;">${grades.D}</div></div>
-                        <div><span class="grade-badge grade-E">Grade E</span><div style="font-size: 24px; font-weight: 700; margin-top: 8px;">${grades.E}</div></div>
-                    </div>
-                `;
+        // ==========================================
+        // SEARCH & SORTING (Frontend)
+        // ==========================================
+        function searchStudent() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (!keyword) {
+                showToast('Masukkan kata kunci pencarian', 'warning', 'globalAlert');
+                return;
             }
+            const results = students.filter(s => 
+                s.nama.toLowerCase().includes(keyword.toLowerCase()) || 
+                s.nim.includes(keyword)
+            );
+            const area = document.getElementById('searchResultArea');
+            if (results.length === 0) {
+                area.innerHTML = `<div class="card" style="margin-top:12px">❌ Tidak ditemukan: ${escapeHtml(keyword)}</div>`;
+            } else {
+                let html = `<div class="card" style="margin-top:12px"><strong>✅ Ditemukan ${results.length} data:</strong>`;
+                results.forEach(s => {
+                    html += `<div style="padding:10px; border-bottom:1px solid var(--border)">
+                                <b style="color:var(--primary)">${escapeHtml(s.nama)}</b> (${s.nim})<br>
+                                ${escapeHtml(s.jurusan)} | Nilai: ${s.nilai_akhir || 0}
+                            </div>`;
+                });
+                html += `</div>`;
+                area.innerHTML = html;
+            }
+            area.style.display = 'block';
         }
 
-        // CRUD Operations
-        function addStudent(data) {
-            if (!/^\d{12}$/.test(data.nim)) throw new Error("NIM harus 12 digit angka");
-            if (data.nama.trim().length < 3) throw new Error("Nama minimal 3 huruf");
-            if (students.find(s => s.nim === data.nim)) throw new Error("NIM sudah terdaftar");
-            
-            const na = hitungNilaiAkhir(data);
-            const ipk = hitungIPK(na);
-            const grade = getGrade(na);
-            students.push({ ...data, nilaiAkhir: na, ipk, grade });
-            saveToStorage();
-            renderList();
-            updateAllStats();
-            showToast("Mahasiswa berhasil ditambahkan!", "success", "globalAlert");
-        }
-
-        function updateStudent(oldNim, newData) {
-            const idx = students.findIndex(s => s.nim === oldNim);
-            if (idx === -1) throw new Error("Data tidak ditemukan");
-            const na = hitungNilaiAkhir(newData);
-            const ipk = hitungIPK(na);
-            const grade = getGrade(na);
-            students[idx] = { ...newData, nilaiAkhir: na, ipk, grade };
-            saveToStorage();
-            renderList();
-            updateAllStats();
-            showToast("Data berhasil diupdate!", "success", "globalAlert");
-        }
-
-        function deleteStudent(nim) {
-            students = students.filter(s => s.nim !== nim);
-            saveToStorage();
-            renderList();
-            updateAllStats();
-            showToast("Data berhasil dihapus!", "success", "globalAlert");
-        }
-
-        // Sorting
         function sortByName() {
-            for (let i = 0; i < students.length - 1; i++)
-                for (let j = 0; j < students.length - i - 1; j++)
-                    if (students[j].nama.toLowerCase() > students[j + 1].nama.toLowerCase())
-                        [students[j], students[j + 1]] = [students[j + 1], students[j]];
-            saveToStorage(); renderList(); showToast("Diurutkan berdasarkan Nama", "success", "globalAlert");
+            students.sort((a, b) => a.nama.localeCompare(b.nama));
+            renderList();
+            showToast('Diurutkan berdasarkan Nama', 'success', 'globalAlert');
         }
 
         function sortByIpk() {
-            for (let i = 0; i < students.length; i++) {
-                let maxIdx = i;
-                for (let j = i + 1; j < students.length; j++)
-                    if (students[j].ipk > students[maxIdx].ipk) maxIdx = j;
-                [students[i], students[maxIdx]] = [students[maxIdx], students[i]];
-            }
-            saveToStorage(); renderList(); showToast("Diurutkan berdasarkan IPK Tertinggi", "success", "globalAlert");
+            students.sort((a, b) => parseFloat(b.ipk || 0) - parseFloat(a.ipk || 0));
+            renderList();
+            showToast('Diurutkan berdasarkan IPK Tertinggi', 'success', 'globalAlert');
         }
 
         function sortByNilai() {
-            students.sort((a, b) => b.nilaiAkhir - a.nilaiAkhir);
-            saveToStorage(); renderList(); showToast("Diurutkan berdasarkan Nilai Akhir", "success", "globalAlert");
+            students.sort((a, b) => parseFloat(b.nilai_akhir || 0) - parseFloat(a.nilai_akhir || 0));
+            renderList();
+            showToast('Diurutkan berdasarkan Nilai Akhir', 'success', 'globalAlert');
         }
 
-        // Search Methods
-        function sequentialSearch(key) {
-            const kw = key.toLowerCase();
-            const results = [];
-            let comp = 0;
-            for (let s of students) {
-                comp++;
-                if (s.nama.toLowerCase().includes(kw) || s.nim.includes(kw)) results.push(s);
-            }
-            return { results, comparisons: comp, complexity: "O(n)" };
-        }
-
-        function linearSearch(key) {
-            const kw = key.toLowerCase();
-            const results = [];
-            let comp = 0;
-            for (let s of students) {
-                comp++;
-                if (s.nama.toLowerCase() === kw || s.nim === kw) results.push(s);
-            }
-            return { results, comparisons: comp, complexity: "O(n)" };
-        }
-
-        function binarySearch(key) {
-            const kw = key.toLowerCase();
-            let comp = 0;
-            const sorted = [...students].sort((a, b) => a.nama.toLowerCase().localeCompare(b.nama.toLowerCase()));
-            let left = 0, right = sorted.length - 1;
-            let found = null;
-            while (left <= right) {
-                comp++;
-                const mid = Math.floor((left + right) / 2);
-                const midName = sorted[mid].nama.toLowerCase();
-                if (midName === kw) { found = sorted[mid]; break; }
-                else if (midName < kw) left = mid + 1;
-                else right = mid - 1;
-            }
-            const results = found ? students.filter(s => s.nama.toLowerCase() === kw) : [];
-            return { results, comparisons: comp, complexity: "O(log n)" };
-        }
-
-        function executeSearch() {
-            const keyword = document.getElementById("searchInput").value.trim();
-            if (!keyword) return showToast("Masukkan kata kunci", "warning", "globalAlert");
-            let result;
-            const start = performance.now();
-            if (currentMethod === "sequential") result = sequentialSearch(keyword);
-            else if (currentMethod === "linear") result = linearSearch(keyword);
-            else result = binarySearch(keyword);
-            const time = (performance.now() - start).toFixed(2);
-
-            const area = document.getElementById("searchResultArea");
-            const names = { sequential: "Sequential", linear: "Linear", binary: "Binary" };
-            let html = `<div class="result-box">
-                <div><strong>${names[currentMethod]} Search</strong> | <span style="color: var(--primary);">${result.complexity}</span></div>
-                <div style="font-size:12px;">Waktu: ${time} ms | Perbandingan: ${result.comparisons} kali</div>`;
-            if (result.results.length === 0) html += `<div style="color: var(--danger); margin-top:12px;">Tidak ditemukan: ${escapeHtml(keyword)}</div>`;
-            else {
-                html += `<div style="margin-top:12px;"><strong>Ditemukan ${result.results.length} data:</strong>`;
-                result.results.forEach(s => {
-                    html += `<div style="background: var(--bg-card); border-radius:12px; padding:10px; margin-top:8px;">
-                                <b style="color: var(--primary);">${escapeHtml(s.nama)}</b> (${s.nim})<br>
-                                <span style="font-size:11px;">${escapeHtml(s.jurusan)} | IPK: ${s.ipk.toFixed(2)} | Grade: ${s.grade}</span>
-                             </div>`;
-                });
-                html += `</div>`;
-            }
-            html += `</div>`;
-            area.style.display = "block";
-            area.innerHTML = html;
-        }
-
-        // Modal handlers
+        // ==========================================
+        // MODAL HANDLERS
+        // ==========================================
         function openModal() {
             isEdit = false;
             editTargetNim = null;
-            document.getElementById("modalTitle").innerText = "Tambah Mahasiswa";
-            document.getElementById("mNim").value = "";
-            document.getElementById("mNama").value = "";
-            document.getElementById("mEmail").value = "";
-            document.getElementById("mHp").value = "";
-            document.getElementById("mJurusan").value = "Teknik Informatika";
-            document.getElementById("mAlamat").value = "";
-            document.getElementById("mAbsensi").value = 90;
-            document.getElementById("mTugasHarian").value = 80;
-            document.getElementById("mPraktikum").value = 80;
-            document.getElementById("mUTS").value = 80;
-            document.getElementById("mUAS").value = 80;
-            document.getElementById("mProyek").value = 80;
-            document.getElementById("mSoftskill").value = 80;
-            document.getElementById("errNim").innerText = "";
-            document.getElementById("modalAlert").style.display = "none";
-            document.getElementById("crudModal").style.display = "flex";
+            document.getElementById('modalTitle').innerText = 'Tambah Mahasiswa';
+            clearModal();
+            document.getElementById('crudModal').style.display = 'flex';
         }
 
         function editStudent(nim) {
@@ -1267,311 +855,382 @@
             if (!s) return;
             isEdit = true;
             editTargetNim = nim;
-            document.getElementById("modalTitle").innerText = "Edit Mahasiswa";
-            document.getElementById("mNim").value = s.nim;
-            document.getElementById("mNama").value = s.nama;
-            document.getElementById("mEmail").value = s.email;
-            document.getElementById("mHp").value = s.hp || "";
-            document.getElementById("mJurusan").value = s.jurusan;
-            document.getElementById("mAlamat").value = s.alamat || "";
-            document.getElementById("mAbsensi").value = s.absensi || 90;
-            document.getElementById("mTugasHarian").value = s.tugasHarian || 80;
-            document.getElementById("mPraktikum").value = s.praktikum || 80;
-            document.getElementById("mUTS").value = s.uts || 80;
-            document.getElementById("mUAS").value = s.uas || 80;
-            document.getElementById("mProyek").value = s.proyek || 80;
-            document.getElementById("mSoftskill").value = s.softskill || 80;
-            document.getElementById("errNim").innerText = "";
-            document.getElementById("modalAlert").style.display = "none";
-            document.getElementById("crudModal").style.display = "flex";
+            document.getElementById('modalTitle').innerText = 'Edit Mahasiswa';
+            document.getElementById('mNim').value = s.nim;
+            document.getElementById('mNama').value = s.nama;
+            document.getElementById('mEmail').value = s.email;
+            document.getElementById('mHp').value = s.hp || '';
+            document.getElementById('mJurusan').value = s.jurusan;
+            document.getElementById('mAlamat').value = s.alamat || '';
+            document.getElementById('mAbsensi').value = s.absensi || 90;
+            document.getElementById('mTugasHarian').value = s.tugas_harian || 80;
+            document.getElementById('mPraktikum').value = s.praktikum || 80;
+            document.getElementById('mUTS').value = s.uts || 80;
+            document.getElementById('mUAS').value = s.uas || 80;
+            document.getElementById('mProyek').value = s.proyek || 80;
+            document.getElementById('mSoftskill').value = s.softskill || 80;
+            document.getElementById('errNim').innerText = '';
+            document.getElementById('modalAlert').style.display = 'none';
+            document.getElementById('crudModal').style.display = 'flex';
         }
 
-        function saveStudent() {
+        function clearModal() {
+            document.getElementById('mNim').value = '';
+            document.getElementById('mNama').value = '';
+            document.getElementById('mEmail').value = '';
+            document.getElementById('mHp').value = '';
+            document.getElementById('mJurusan').value = 'Teknik Informatika';
+            document.getElementById('mAlamat').value = '';
+            document.getElementById('mAbsensi').value = 90;
+            document.getElementById('mTugasHarian').value = 80;
+            document.getElementById('mPraktikum').value = 80;
+            document.getElementById('mUTS').value = 80;
+            document.getElementById('mUAS').value = 80;
+            document.getElementById('mProyek').value = 80;
+            document.getElementById('mSoftskill').value = 80;
+            document.getElementById('errNim').innerText = '';
+        }
+
+        async function saveStudent() {
             try {
                 const data = {
-                    nim: document.getElementById("mNim").value.trim(),
-                    nama: document.getElementById("mNama").value.trim(),
-                    email: document.getElementById("mEmail").value.trim(),
-                    hp: document.getElementById("mHp").value.trim(),
-                    jurusan: document.getElementById("mJurusan").value.trim() || "Umum",
-                    alamat: document.getElementById("mAlamat").value.trim(),
-                    absensi: parseFloat(document.getElementById("mAbsensi").value) || 0,
-                    tugasHarian: parseFloat(document.getElementById("mTugasHarian").value) || 0,
-                    praktikum: parseFloat(document.getElementById("mPraktikum").value) || 0,
-                    uts: parseFloat(document.getElementById("mUTS").value) || 0,
-                    uas: parseFloat(document.getElementById("mUAS").value) || 0,
-                    proyek: parseFloat(document.getElementById("mProyek").value) || 0,
-                    softskill: parseFloat(document.getElementById("mSoftskill").value) || 0
+                    nim: document.getElementById('mNim').value.trim(),
+                    nama: document.getElementById('mNama').value.trim(),
+                    email: document.getElementById('mEmail').value.trim(),
+                    hp: document.getElementById('mHp').value.trim(),
+                    jurusan: document.getElementById('mJurusan').value.trim() || 'Umum',
+                    alamat: document.getElementById('mAlamat').value.trim(),
+                    absensi: parseFloat(document.getElementById('mAbsensi').value) || 0,
+                    tugas_harian: parseFloat(document.getElementById('mTugasHarian').value) || 0,
+                    praktikum: parseFloat(document.getElementById('mPraktikum').value) || 0,
+                    uts: parseFloat(document.getElementById('mUTS').value) || 0,
+                    uas: parseFloat(document.getElementById('mUAS').value) || 0,
+                    proyek: parseFloat(document.getElementById('mProyek').value) || 0,
+                    softskill: parseFloat(document.getElementById('mSoftskill').value) || 0
                 };
+                
                 if (!/^\d{12}$/.test(data.nim)) {
-                    document.getElementById("errNim").innerText = "NIM harus 12 digit angka";
+                    document.getElementById('errNim').innerText = 'NIM harus 12 digit angka';
                     return;
                 }
-                for (let key of ['absensi', 'tugasHarian', 'praktikum', 'uts', 'uas', 'proyek', 'softskill']) {
-                    if (data[key] < 0 || data[key] > 100) {
-                        throw new Error(`Nilai ${key} harus antara 0-100`);
-                    }
+                
+                if (isEdit) {
+                    await updateStudent(editTargetNim, data);
+                } else {
+                    await addStudent(data);
                 }
-                if (isEdit) updateStudent(editTargetNim, data);
-                else addStudent(data);
-                closeCrudModal();
+                closeModal();
             } catch (e) {
-                showToast(e.message, "error", "modalAlert");
+                showToast(e.message, 'error', 'modalAlert');
             }
         }
 
-        function hapusConfirm(nim) { if (confirm("Yakin ingin menghapus data ini?")) deleteStudent(nim); }
-        function closeCrudModal() { document.getElementById("crudModal").style.display = "none"; }
+        function closeModal() { document.getElementById('crudModal').style.display = 'none'; }
+        function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
 
-        function showDetail(nim) {
-            const s = students.find(x => x.nim === nim);
-            if (!s) return;
-            document.getElementById("detailNama").innerHTML = escapeHtml(s.nama);
-            const gradeClass = `grade-${s.grade}`;
-            document.getElementById("detailContent").innerHTML = `
-                <div class="detail-row"><div class="detail-label">NIM</div><div class="detail-value">${s.nim}</div></div>
-                <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(s.email)}</div></div>
-                <div class="detail-row"><div class="detail-label">No. HP</div><div class="detail-value">${s.hp || '-'}</div></div>
-                <div class="detail-row"><div class="detail-label">Jurusan</div><div class="detail-value">${escapeHtml(s.jurusan)}</div></div>
-                <div class="detail-row"><div class="detail-label">Alamat</div><div class="detail-value">${escapeHtml(s.alamat) || '-'}</div></div>
-                <div class="detail-row"><div class="detail-label">Grade / IPK</div><div class="detail-value"><span class="grade-badge ${gradeClass}">Grade ${s.grade}</span> | IPK ${s.ipk.toFixed(2)}</div></div>
-                <div style="background: var(--bg-secondary); border-radius: 14px; padding: 14px; margin: 12px 0;">
-                    <div style="font-weight: 700; margin-bottom: 10px;">Nilai Akademik Lengkap</div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                        <div>📋 Absensi: ${s.absensi || 0}</div>
-                        <div>📝 Tugas Harian: ${s.tugasHarian || 0}</div>
-                        <div>🔬 Praktikum: ${s.praktikum || 0}</div>
-                        <div>📖 UTS: ${s.uts || 0}</div>
-                        <div>📚 UAS: ${s.uas || 0}</div>
-                        <div>💼 Proyek: ${s.proyek || 0}</div>
-                        <div>⭐ Softskill: ${s.softskill || 0}</div>
-                    </div>
-                    <div style="margin-top: 12px; font-weight: 700; color: var(--primary);">Nilai Akhir: ${s.nilaiAkhir.toFixed(2)}</div>
-                </div>
-                <div class="bobot-info">
-                    <strong>📊 Bobot Penilaian:</strong> Absensi 5% | Tugas 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%
-                </div>
-            `;
-            document.getElementById("detailModal").style.display = "flex";
-        }
-        function closeDetailModal() { document.getElementById("detailModal").style.display = "none"; }
-
-        // Password change
-        function showChangePassword() {
-            document.getElementById("passwordModal").style.display = "flex";
-            document.getElementById("oldPassword").value = "";
-            document.getElementById("newPassword").value = "";
-            document.getElementById("confirmNewPassword").value = "";
-            document.getElementById("passwordAlert").style.display = "none";
-        }
-        function closePasswordModal() { document.getElementById("passwordModal").style.display = "none"; }
-        function changePassword() {
-            const oldPass = document.getElementById("oldPassword").value;
-            const newPass = document.getElementById("newPassword").value;
-            const confirmPass = document.getElementById("confirmNewPassword").value;
-            const userIndex = users.findIndex(u => u.username === currentUser);
-            if (userIndex === -1) return showToast("User tidak ditemukan", "error", "passwordAlert");
-            if (users[userIndex].password !== oldPass) return showToast("Password lama salah", "error", "passwordAlert");
-            if (newPass.length < 6) return showToast("Password baru minimal 6 karakter", "error", "passwordAlert");
-            if (newPass !== confirmPass) return showToast("Konfirmasi password tidak cocok", "error", "passwordAlert");
-            users[userIndex].password = newPass;
-            saveToStorage();
-            showToast("Password berhasil diubah", "success", "passwordAlert");
-            setTimeout(() => closePasswordModal(), 1500);
-        }
-
-        // Export
-        function exportData() {
-            const data = { export_date: new Date().toISOString(), total_data: students.length, mahasiswa: students };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `data_mahasiswa_${new Date().toISOString().slice(0, 19)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast("Data berhasil diekspor", "success", "globalAlert");
-        }
-
-        function exportUsersData() {
-            const data = { export_date: new Date().toISOString(), users: users.map(u => ({ username: u.username, created_at: u.created_at })) };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `data_akun_${new Date().toISOString().slice(0, 19)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast("Data akun berhasil diekspor", "success", "globalAlert");
-        }
-
-        // Navigation
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            const mainContent = document.getElementById("mainContent");
-            sidebar.classList.toggle("collapsed");
-            mainContent.classList.toggle("expanded");
-            const btn = document.querySelector(".toggle-sidebar");
-            if (btn) btn.innerHTML = sidebar.classList.contains("collapsed") ? "▶" : "◀";
-        }
-
-        function mobileToggleSidebar() { document.getElementById("sidebar").classList.toggle("mobile-open"); }
-
-        function switchPage(pageId) {
-            document.querySelectorAll(".page-content").forEach(p => p.classList.remove("active-page"));
-            const targetPage = document.getElementById(`page-${pageId}`);
-            if (targetPage) targetPage.classList.add("active-page");
-            document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-            const activeNav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-            if (activeNav) activeNav.classList.add("active");
-            const titles = { dashboard: "Dashboard", datamahasiswa: "Data Mahasiswa", statistik: "Statistik Nilai", pengaturan: "Pengaturan Akun", export: "Ekspor Data", tentang: "Tentang Aplikasi" };
-            const titleEl = document.getElementById("pageTitle");
-            if (titleEl) titleEl.innerText = titles[pageId] || "Dashboard";
-            if (pageId === "pengaturan") {
-                const usernameEl = document.getElementById("currentUsername");
-                if (usernameEl) usernameEl.innerText = currentUser;
-            }
-            if (window.innerWidth <= 768) document.getElementById("sidebar").classList.remove("mobile-open");
-        }
-
-        // Auth
+        // ==========================================
+        // AUTHENTICATION
+        // ==========================================
         function doLogin() {
-            const user = document.getElementById("loginUser").value.trim();
-            const pass = document.getElementById("loginPass").value;
-            const found = users.find(u => u.username === user && u.password === pass);
-            if (!found) return showToast("Username atau password salah", "error", "loginAlert");
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value;
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                showToast('Username atau password salah!', 'error', 'loginAlert');
+                return;
+            }
             currentUser = user;
-            localStorage.setItem("current_session_final_v6", user);
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
             renderDashboard();
         }
 
         function doRegister() {
-            const user = document.getElementById("regUser").value.trim();
-            const pass = document.getElementById("regPass").value;
-            const confirm = document.getElementById("regConfirm").value;
-            if (!/^[a-zA-Z0-9]{3,}$/.test(user)) {
-                document.getElementById("regUserErr").innerText = "Minimal 3 karakter (huruf/angka)";
+            const username = document.getElementById('regUser').value.trim();
+            const password = document.getElementById('regPass').value;
+            const confirm = document.getElementById('regConfirm').value;
+            if (username.length < 3) {
+                showToast('Username minimal 3 karakter', 'error', 'regAlert');
                 return;
             }
-            if (users.find(u => u.username === user)) {
-                document.getElementById("regUserErr").innerText = "Username sudah terdaftar";
+            if (password.length < 6) {
+                showToast('Password minimal 6 karakter', 'error', 'regAlert');
                 return;
             }
-            if (pass.length < 6) {
-                document.getElementById("regPassErr").innerText = "Minimal 6 karakter";
+            if (password !== confirm) {
+                showToast('Konfirmasi password tidak cocok', 'error', 'regAlert');
                 return;
             }
-            if (pass !== confirm) return showToast("Password konfirmasi tidak cocok", "error", "regAlert");
-            users.push({ username: user, password: pass, created_at: new Date().toISOString() });
-            saveToStorage();
-            showToast("Pendaftaran berhasil! Silakan login.", "success", "regAlert");
+            if (users.find(u => u.username === username)) {
+                showToast('Username sudah terdaftar!', 'error', 'regAlert');
+                return;
+            }
+            users.push({ username, password });
+            showToast('Pendaftaran berhasil! Silakan login.', 'success', 'regAlert');
             setTimeout(() => showLoginPage(), 1500);
         }
 
+        // ==========================================
+        // NAVIGATION
+        // ==========================================
         function showLoginPage() {
-            const app = document.getElementById("app-root");
-            app.innerHTML = `
+            document.getElementById('app-root').innerHTML = `
                 <div class="login-wrapper">
                     <div class="login-card">
-                        <div class="login-logo"><div class="icon">🎓</div><h2>Sistem Manajemen Mahasiswa</h2><p class="login-subtitle">Login untuk mengakses dashboard</p></div>
+                        <div style="text-align:center;margin-bottom:24px">
+                            <div style="width:70px;height:70px;background:linear-gradient(135deg,#6366f1,#a855f7);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">🎓</div>
+                            <h2>Sistem Manajemen Mahasiswa</h2>
+                            <p style="color:var(--text-secondary);margin-top:8px">Login untuk mengakses dashboard</p>
+                        </div>
                         <div id="loginAlert" class="alert"></div>
                         <div class="form-group"><label>Username</label><input type="text" id="loginUser" value="admin"></div>
-                        <div class="form-group"><label>Password</label><div class="password-wrapper"><input type="password" id="loginPass" value="admin123"><button type="button" class="toggle-password" onclick="window.togglePassword('loginPass', this)">👁</button></div></div>
-                        <button class="btn btn-primary" style="width:100%;" onclick="window.doLogin()">Masuk</button>
-                        <div class="demo-info"><p>Demo Akun</p><div class="demo-badge"><span>Username: admin</span><span>Password: admin123</span></div></div>
-                        <p style="text-align:center; margin-top:20px;">Belum punya akun? <a href="#" onclick="window.showRegisterPage()" style="color: var(--primary);">Daftar Sekarang</a></p>
+                        <div class="form-group"><label>Password</label><input type="password" id="loginPass" value="admin123"></div>
+                        <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
+                        <div class="demo-info">
+                            <p>📋 Demo Akun</p>
+                            <div class="demo-badge"><span>Username: admin</span><span>Password: admin123</span></div>
+                        </div>
+                        <p style="text-align:center;margin-top:20px">Belum punya akun? <a href="#" onclick="showRegisterPage()" style="color:var(--primary)">Daftar Sekarang</a></p>
                     </div>
                 </div>
             `;
         }
 
         function showRegisterPage() {
-            const app = document.getElementById("app-root");
-            app.innerHTML = `
+            document.getElementById('app-root').innerHTML = `
                 <div class="login-wrapper">
                     <div class="login-card">
-                        <div class="login-logo"><div class="icon">📝</div><h2>Daftar Akun Baru</h2><p class="login-subtitle">Isi data untuk mendaftar</p></div>
+                        <div style="text-align:center;margin-bottom:24px">
+                            <div style="width:70px;height:70px;background:linear-gradient(135deg,#6366f1,#a855f7);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">📝</div>
+                            <h2>Daftar Akun Baru</h2>
+                            <p style="color:var(--text-secondary);margin-top:8px">Isi data untuk mendaftar</p>
+                        </div>
                         <div id="regAlert" class="alert"></div>
-                        <div class="form-group"><label>Username (min 3)</label><input type="text" id="regUser"><span class="error-text" id="regUserErr"></span></div>
-                        <div class="form-group"><label>Password (min 6)</label><div class="password-wrapper"><input type="password" id="regPass"><button type="button" class="toggle-password" onclick="window.togglePassword('regPass', this)">👁</button></div><span class="error-text" id="regPassErr"></span></div>
-                        <div class="form-group"><label>Konfirmasi Password</label><div class="password-wrapper"><input type="password" id="regConfirm"><button type="button" class="toggle-password" onclick="window.togglePassword('regConfirm', this)">👁</button></div></div>
-                        <button class="btn btn-primary" style="width:100%;" onclick="window.doRegister()">Daftar</button>
-                        <p style="text-align:center; margin-top:20px;">Sudah punya akun? <a href="#" onclick="window.showLoginPage()" style="color: var(--primary);">Login disini</a></p>
+                        <div class="form-group"><label>Username (min 3)</label><input type="text" id="regUser"></div>
+                        <div class="form-group"><label>Password (min 6)</label><input type="password" id="regPass"></div>
+                        <div class="form-group"><label>Konfirmasi Password</label><input type="password" id="regConfirm"></div>
+                        <button class="btn btn-primary" onclick="doRegister()">Daftar</button>
+                        <p style="text-align:center;margin-top:20px">Sudah punya akun? <a href="#" onclick="showLoginPage()" style="color:var(--primary)">Login disini</a></p>
                     </div>
                 </div>
             `;
         }
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        }
+
+        function mobileToggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(`page-${pageId}`).classList.add('active-page');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${pageId}"]`).classList.add('active');
+            const titles = { dashboard: 'Dashboard', datamahasiswa: 'Data Mahasiswa', statistik: 'Statistik Nilai' };
+            document.getElementById('pageTitle').innerText = titles[pageId] || 'Dashboard';
+            if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('mobile-open');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showLoginPage();
+        }
+
+        // ==========================================
+        // RENDER DASHBOARD
+        // ==========================================
         function renderDashboard() {
-            const app = document.getElementById("app-root");
-            app.innerHTML = `
+            const firstLetter = currentUser?.username?.charAt(0)?.toUpperCase() || 'A';
+            document.getElementById('app-root').innerHTML = `
                 <div class="app-layout">
                     <div class="sidebar" id="sidebar">
-                        <div class="sidebar-header"><h3>Manajemen Mahasiswa</h3><button class="toggle-sidebar" onclick="window.toggleSidebar()">◀</button></div>
+                        <div class="sidebar-header">
+                            <h3>Manajemen Mahasiswa</h3>
+                            <button class="toggle-sidebar" onclick="toggleSidebar()" style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer">◀</button>
+                        </div>
                         <div class="nav-menu">
                             <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></div>
                             <div class="nav-item" data-page="datamahasiswa"><span class="nav-icon">👥</span><span class="nav-label">Data Mahasiswa</span></div>
-                            <div class="nav-item" data-page="statistik"><span class="nav-icon">📈</span><span class="nav-label">Statistik Nilai</span></div>
-                            <div class="nav-item" data-page="pengaturan"><span class="nav-icon">⚙️</span><span class="nav-label">Pengaturan Akun</span></div>
-                            <div class="nav-item" data-page="export"><span class="nav-icon">💾</span><span class="nav-label">Ekspor Data</span></div>
-                            <div class="nav-item" data-page="tentang"><span class="nav-icon">ℹ️</span><span class="nav-label">Tentang</span></div>
+                            <div class="nav-item" data-page="statistik"><span class="nav-icon">📈</span><span class="nav-label">Statistik</span></div>
                         </div>
-                        <div class="sidebar-footer"><div class="user-info-sidebar"><div class="user-avatar-small" id="sidebarAvatar">${currentUser.charAt(0).toUpperCase()}</div><div class="user-details"><div class="user-name" id="sidebarUsername">${currentUser}</div><div class="user-role">Administrator</div></div></div></div>
+                        <div class="sidebar-footer">
+                            <div class="user-info-sidebar">
+                                <div class="user-avatar-small">${firstLetter}</div>
+                                <div><div>${currentUser?.username || 'Admin'}</div><div style="font-size:11px;color:var(--text-muted)">Administrator</div></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="main-content" id="mainContent">
                         <div class="top-bar">
-                            <button class="mobile-menu-btn" onclick="window.mobileToggleSidebar()">☰ Menu</button>
+                            <button class="mobile-menu-btn" onclick="mobileToggleSidebar()">☰ Menu</button>
                             <h1 class="page-title" id="pageTitle">Dashboard</h1>
-                            <div class="top-actions"><button class="theme-toggle-btn" id="themeToggleBtn" onclick="window.toggleTheme()"><span class="theme-icon">🌙</span><span>Mode Gelap</span></button><div class="user-badge" id="userBadge">${currentUser.charAt(0).toUpperCase()}</div><button class="btn btn-outline btn-sm" onclick="window.logout()">Logout</button></div>
-                        </div>
-                        <div class="container">
-                            <div id="page-dashboard" class="page-content active-page">
-                                <div class="stats-main"><div class="stat-card"><div class="stat-number" id="totalMhs">0</div><div class="stat-label">Total Mahasiswa</div></div><div class="stat-card"><div class="stat-number" id="avgIpk">0</div><div class="stat-label">Rata-rata IPK</div></div><div class="stat-card"><div class="stat-number" id="avgNilaiAkhir">0</div><div class="stat-label">Rata Nilai Akhir</div></div><div class="stat-card"><div class="stat-number" id="gradeCount">0</div><div class="stat-label">Grade A</div></div></div>
-                                <div class="stats-nilai"><div class="nilai-item"><div class="nilai-angka" id="avgAbsensi">0</div><div class="nilai-label">Rata Absensi</div></div><div class="nilai-item"><div class="nilai-angka" id="avgTugasHarian">0</div><div class="nilai-label">Rata Tugas</div></div><div class="nilai-item"><div class="nilai-angka" id="avgPraktikum">0</div><div class="nilai-label">Rata Praktikum</div></div><div class="nilai-item"><div class="nilai-angka" id="avgUTS">0</div><div class="nilai-label">Rata UTS</div></div><div class="nilai-item"><div class="nilai-angka" id="avgUAS">0</div><div class="nilai-label">Rata UAS</div></div><div class="nilai-item"><div class="nilai-angka" id="avgProyek">0</div><div class="nilai-label">Rata Proyek</div></div><div class="nilai-item"><div class="nilai-angka" id="avgSoftskill">0</div><div class="nilai-label">Rata Softskill</div></div><div class="nilai-item"><div class="nilai-angka" id="nilaiTertinggi">0</div><div class="nilai-label">Nilai Tertinggi</div></div><div class="nilai-item"><div class="nilai-angka" id="nilaiTerendah">0</div><div class="nilai-label">Nilai Terendah</div></div></div>
-                                <div class="card"><div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div><p style="color: var(--text-secondary);">Sistem penilaian lengkap dengan 7 komponen nilai (Absensi, Tugas, Praktikum, UTS, UAS, Proyek, Softskill).</p><div class="btn-group" style="margin-top:20px;"><button class="btn btn-primary" onclick="window.switchPage('datamahasiswa')">Kelola Data Mahasiswa</button><button class="btn btn-outline" onclick="window.switchPage('statistik')">Lihat Statistik</button></div></div>
+                            <div class="top-actions">
+                                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙 Mode Gelap</button>
+                                <div class="user-badge">${firstLetter}</div>
+                                <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
                             </div>
-                            <div id="page-datamahasiswa" class="page-content"><div id="globalAlert" class="alert"></div><div class="btn-group"><button class="btn btn-primary" onclick="window.openModal()">Tambah Mahasiswa</button><button class="btn btn-outline" onclick="window.sortByName()">Urut Nama</button><button class="btn btn-outline" onclick="window.sortByIpk()">Urut IPK</button><button class="btn btn-outline" onclick="window.sortByNilai()">Urut Nilai Akhir</button></div><div class="card"><div class="card-header">3 Metode Pencarian</div><div class="method-group"><button class="method-btn active" data-method="sequential">Sequential</button><button class="method-btn" data-method="linear">Linear</button><button class="method-btn" data-method="binary">Binary</button></div><div class="search-row"><input type="text" id="searchInput" placeholder="Cari Nama atau NIM..."><button class="btn btn-primary" onclick="window.executeSearch()">Cari</button></div><div id="searchResultArea" style="display:none;"></div></div><div class="card" style="margin-top:20px;"><div class="card-header">Daftar Mahasiswa <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(klik nama untuk detail lengkap)</span></div><div id="studentList"></div></div></div>
-                            <div id="page-statistik" class="page-content"><div class="stats-main"><div class="stat-card"><div class="stat-number" id="statTotalMhs">0</div><div class="stat-label">Total Mahasiswa</div></div><div class="stat-card"><div class="stat-number" id="statRataIpk">0</div><div class="stat-label">Rata IPK</div></div><div class="stat-card"><div class="stat-number" id="statRataNilai">0</div><div class="stat-label">Rata Nilai Akhir</div></div><div class="stat-card"><div class="stat-number" id="statGradeA">0</div><div class="stat-label">Grade A</div></div></div><div class="stats-nilai"><div class="nilai-item"><div class="nilai-angka" id="statAbsensi">0</div><div class="nilai-label">Rata Absensi</div></div><div class="nilai-item"><div class="nilai-angka" id="statTugasHarian">0</div><div class="nilai-label">Rata Tugas</div></div><div class="nilai-item"><div class="nilai-angka" id="statPraktikum">0</div><div class="nilai-label">Rata Praktikum</div></div><div class="nilai-item"><div class="nilai-angka" id="statUTS">0</div><div class="nilai-label">Rata UTS</div></div><div class="nilai-item"><div class="nilai-angka" id="statUAS">0</div><div class="nilai-label">Rata UAS</div></div><div class="nilai-item"><div class="nilai-angka" id="statProyek">0</div><div class="nilai-label">Rata Proyek</div></div><div class="nilai-item"><div class="nilai-angka" id="statSoftskill">0</div><div class="nilai-label">Rata Softskill</div></div><div class="nilai-item"><div class="nilai-angka" id="statMax">0</div><div class="nilai-label">Nilai Tertinggi</div></div><div class="nilai-item"><div class="nilai-angka" id="statMin">0</div><div class="nilai-label">Nilai Terendah</div></div></div><div class="card"><div class="card-header">Distribusi Grade</div><div id="gradeDistribution"></div><div class="bobot-info" style="margin-top:20px;"><strong>📊 Bobot Penilaian:</strong> Absensi 5% | Tugas Harian 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%</div></div></div>
-                            <div id="page-pengaturan" class="page-content"><div class="card"><div class="card-header">Pengaturan Akun</div><div id="settingsAlert" class="alert"></div><div class="settings-group"><div class="settings-item"><span>Username</span><span id="currentUsername" style="color:var(--primary);">${currentUser}</span></div><div class="settings-item"><span>Ganti Password</span><button class="btn btn-outline btn-sm" onclick="window.showChangePassword()">Ubah Password</button></div></div></div></div>
-                            <div id="page-export" class="page-content"><div class="card"><div class="card-header">Ekspor Data</div><p style="color:var(--text-secondary); margin-bottom:20px;">Ekspor data mahasiswa lengkap dengan 7 komponen nilai ke format JSON.</p><div class="btn-group"><button class="btn btn-primary" onclick="window.exportData()">Ekspor Data Mahasiswa</button><button class="btn btn-outline" onclick="window.exportUsersData()">Ekspor Data Akun</button></div></div></div>
-                            <div id="page-tentang" class="page-content"><div class="card"><div class="card-header">Tentang Aplikasi</div><p><strong>Sistem Manajemen Mahasiswa</strong></p><p style="color:var(--text-secondary); margin:10px 0;">Versi 3.0 |</p><div class="bobot-info" style="margin-top:16px;"><strong>Komponen Penilaian:</strong><br>• Absensi (5%) • Tugas Harian (10%) • Praktikum (15%) • UTS (20%) • UAS (25%) • Proyek (15%) • Softskill (10%)</div></div></div>
+                        </div>
+                        
+                        <!-- Page Dashboard -->
+                        <div id="page-dashboard" class="page-content active-page">
+                            <div class="stats-main">
+                                <div class="stat-card"><div class="stat-number" id="totalMhs">0</div><div class="stat-label">Total Mahasiswa</div></div>
+                                <div class="stat-card"><div class="stat-number" id="avgIpk">0</div><div class="stat-label">Rata-rata IPK</div></div>
+                                <div class="stat-card"><div class="stat-number" id="avgNilai">0</div><div class="stat-label">Rata Nilai Akhir</div></div>
+                                <div class="stat-card"><div class="stat-number" id="gradeCount">0</div><div class="stat-label">Grade A</div></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">Selamat Datang di Sistem Manajemen Mahasiswa</div>
+                                <p>Data tersimpan di <strong>Google Sheets</strong> via SheetDB. Semua perubahan akan langsung tersimpan di Google Drive Anda.</p>
+                                <div class="btn-group" style="margin-top:16px">
+                                    <button class="btn btn-primary" onclick="switchPage('datamahasiswa')">Kelola Data Mahasiswa</button>
+                                    <button class="btn btn-outline" onclick="switchPage('statistik')">Lihat Statistik</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Page Data Mahasiswa -->
+                        <div id="page-datamahasiswa" class="page-content">
+                            <div id="globalAlert" class="alert"></div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="openModal()">+ Tambah Mahasiswa</button>
+                                <button class="btn btn-outline" onclick="sortByName()">📊 Urut Nama</button>
+                                <button class="btn btn-outline" onclick="sortByIpk()">⭐ Urut IPK</button>
+                                <button class="btn btn-outline" onclick="sortByNilai()">🏆 Urut Nilai</button>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">🔍 Cari Mahasiswa</div>
+                                <div class="search-row">
+                                    <input type="text" id="searchInput" placeholder="Cari Nama atau NIM...">
+                                    <button class="btn btn-primary" onclick="searchStudent()">Cari</button>
+                                </div>
+                                <div id="searchResultArea" style="display:none"></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">📜 Daftar Mahasiswa <span style="font-size:12px">(klik nama untuk detail)</span></div>
+                                <div id="studentList"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Page Statistik -->
+                        <div id="page-statistik" class="page-content">
+                            <div class="stats-main">
+                                <div class="stat-card"><div class="stat-number" id="statTotalMhs">0</div><div class="stat-label">Total Mahasiswa</div></div>
+                                <div class="stat-card"><div class="stat-number" id="statRataIpk">0</div><div class="stat-label">Rata-rata IPK</div></div>
+                                <div class="stat-card"><div class="stat-number" id="statRataNilai">0</div><div class="stat-label">Rata Nilai Akhir</div></div>
+                                <div class="stat-card"><div class="stat-number" id="statGradeA">0</div><div class="stat-label">Grade A</div></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">Distribusi Grade</div>
+                                <div id="gradeDistribution"></div>
+                                <div class="bobot-info" style="margin-top:20px">
+                                    <strong>Bobot Penilaian:</strong> Absensi 5% | Tugas 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="crudModal" class="modal"><div class="modal-content"><h2 id="modalTitle">Tambah Mahasiswa</h2><div id="modalAlert" class="alert"></div><div class="form-group"><label>NIM (12 digit)</label><input type="text" id="mNim" maxlength="12"><span class="error-text" id="errNim"></span></div><div class="form-group"><label>Nama Lengkap</label><input type="text" id="mNama"></div><div class="form-group"><label>Email</label><input type="email" id="mEmail"></div><div class="form-row"><div class="form-group"><label>No. HP</label><input type="tel" id="mHp"></div><div class="form-group"><label>Jurusan</label><input type="text" id="mJurusan" value="Teknik Informatika"></div></div><div class="form-group"><label>Alamat</label><input type="text" id="mAlamat"></div><div class="form-section"><div class="form-section-title">📊 Nilai Akademik</div><div class="form-row-4"><div class="form-group"><label>Absensi (0-100)</label><input type="number" id="mAbsensi" value="90" step="1"></div><div class="form-group"><label>Tugas Harian (0-100)</label><input type="number" id="mTugasHarian" value="80" step="1"></div><div class="form-group"><label>Praktikum (0-100)</label><input type="number" id="mPraktikum" value="80" step="1"></div><div class="form-group"><label>UTS (0-100)</label><input type="number" id="mUTS" value="80" step="1"></div></div><div class="form-row-4"><div class="form-group"><label>UAS (0-100)</label><input type="number" id="mUAS" value="80" step="1"></div><div class="form-group"><label>Proyek (0-100)</label><input type="number" id="mProyek" value="80" step="1"></div><div class="form-group"><label>Softskill (0-100)</label><input type="number" id="mSoftskill" value="80" step="1"></div></div><div class="bobot-info"><strong>📊 Bobot:</strong> Absensi 5% | Tugas 10% | Praktikum 15% | UTS 20% | UAS 25% | Proyek 15% | Softskill 10%</div></div><div class="btn-group"><button class="btn btn-outline" onclick="window.closeCrudModal()">Batal</button><button class="btn btn-primary" onclick="window.saveStudent()">Simpan</button></div></div></div>
-                <div id="detailModal" class="modal"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><span id="detailNama" style="font-size:20px; font-weight:700;"></span><button class="close-detail" onclick="window.closeDetailModal()">&times;</button></div><div id="detailContent"></div></div></div>
-                <div id="passwordModal" class="modal"><div class="modal-content"><h2>Ganti Password</h2><div id="passwordAlert" class="alert"></div><div class="form-group"><label>Password Lama</label><div class="password-wrapper"><input type="password" id="oldPassword"><button type="button" class="toggle-password" onclick="window.togglePassword('oldPassword', this)">👁</button></div></div><div class="form-group"><label>Password Baru</label><div class="password-wrapper"><input type="password" id="newPassword"><button type="button" class="toggle-password" onclick="window.togglePassword('newPassword', this)">👁</button></div></div><div class="form-group"><label>Konfirmasi</label><div class="password-wrapper"><input type="password" id="confirmNewPassword"><button type="button" class="toggle-password" onclick="window.togglePassword('confirmNewPassword', this)">👁</button></div></div><div class="btn-group"><button class="btn btn-outline" onclick="window.closePasswordModal()">Batal</button><button class="btn btn-primary" onclick="window.changePassword()">Simpan</button></div></div></div>
+                
+                <!-- Modal CRUD -->
+                <div id="crudModal" class="modal">
+                    <div class="modal-content">
+                        <h2 id="modalTitle" style="margin-bottom:16px">Tambah Mahasiswa</h2>
+                        <div id="modalAlert" class="alert"></div>
+                        <div class="form-group"><label>NIM (12 digit)</label><input type="text" id="mNim" maxlength="12"><span class="error-text" id="errNim"></span></div>
+                        <div class="form-group"><label>Nama Lengkap</label><input type="text" id="mNama"></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="mEmail"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>No. HP</label><input type="tel" id="mHp"></div>
+                            <div class="form-group"><label>Jurusan</label><input type="text" id="mJurusan" value="Teknik Informatika"></div>
+                        </div>
+                        <div class="form-group"><label>Alamat</label><input type="text" id="mAlamat"></div>
+                        <div style="background:var(--bg-input);border-radius:16px;padding:16px;margin:16px 0">
+                            <h4 style="margin-bottom:12px">📊 Nilai Akademik</h4>
+                            <div class="form-row-4">
+                                <div class="form-group"><label>Absensi</label><input type="number" id="mAbsensi" value="90"></div>
+                                <div class="form-group"><label>Tugas Harian</label><input type="number" id="mTugasHarian" value="80"></div>
+                                <div class="form-group"><label>Praktikum</label><input type="number" id="mPraktikum" value="80"></div>
+                                <div class="form-group"><label>UTS</label><input type="number" id="mUTS" value="80"></div>
+                            </div>
+                            <div class="form-row-3">
+                                <div class="form-group"><label>UAS</label><input type="number" id="mUAS" value="80"></div>
+                                <div class="form-group"><label>Proyek</label><input type="number" id="mProyek" value="80"></div>
+                                <div class="form-group"><label>Softskill</label><input type="number" id="mSoftskill" value="80"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group" style="margin-top:16px">
+                            <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+                            <button class="btn btn-primary" onclick="saveStudent()">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Detail -->
+                <div id="detailModal" class="modal">
+                    <div class="modal-content">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+                            <h3>Detail Mahasiswa</h3>
+                            <button onclick="closeDetailModal()" style="background:none;border:none;font-size:24px;cursor:pointer">&times;</button>
+                        </div>
+                        <div id="detailContent"></div>
+                    </div>
+                </div>
             `;
             
-            renderList();
-            updateAllStats();
+            loadMahasiswa();
             updateThemeButton();
             
-            document.querySelectorAll(".method-btn").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    document.querySelectorAll(".method-btn").forEach(b => b.classList.remove("active"));
-                    this.classList.add("active");
-                    currentMethod = this.getAttribute("data-method");
-                    document.getElementById("searchResultArea").style.display = "none";
-                });
+            document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchStudent();
             });
             
-            document.getElementById("searchInput")?.addEventListener("keypress", (e) => { if (e.key === "Enter") executeSearch(); });
-            document.querySelectorAll(".nav-item").forEach(item => { item.addEventListener("click", () => switchPage(item.getAttribute("data-page"))); });
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => switchPage(item.getAttribute('data-page')));
+            });
         }
 
-        function logout() { currentUser = null; localStorage.removeItem("current_session_final_v6"); showLoginPage(); }
+        // ==========================================
+        // INITIALISASI
+        // ==========================================
+        function init() {
+            initTheme();
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    renderDashboard();
+                } catch(e) { showLoginPage(); }
+            } else {
+                showLoginPage();
+            }
+        }
 
-        function init() { initTheme(); loadData(); const sess = localStorage.getItem("current_session_final_v6"); if (sess && users.find(u => u.username === sess)) { currentUser = sess; renderDashboard(); } else { showLoginPage(); } }
-
-        // Expose to window
-        window.togglePassword = togglePassword; window.doLogin = doLogin; window.doRegister = doRegister; window.showLoginPage = showLoginPage; window.showRegisterPage = showRegisterPage;
-        window.logout = logout; window.toggleSidebar = toggleSidebar; window.mobileToggleSidebar = mobileToggleSidebar; window.switchPage = switchPage;
-        window.openModal = openModal; window.editStudent = editStudent; window.saveStudent = saveStudent; window.closeCrudModal = closeCrudModal;
-        window.closeDetailModal = closeDetailModal; window.showDetail = showDetail; window.hapusConfirm = hapusConfirm;
-        window.sortByName = sortByName; window.sortByIpk = sortByIpk; window.sortByNilai = sortByNilai; window.executeSearch = executeSearch;
-        window.exportData = exportData; window.exportUsersData = exportUsersData; window.showChangePassword = showChangePassword;
-        window.closePasswordModal = closePasswordModal; window.changePassword = changePassword; window.toggleTheme = toggleTheme;
+        // Expose functions ke global
+        window.doLogin = doLogin;
+        window.doRegister = doRegister;
+        window.showLoginPage = showLoginPage;
+        window.showRegisterPage = showRegisterPage;
+        window.logout = logout;
+        window.toggleSidebar = toggleSidebar;
+        window.mobileToggleSidebar = mobileToggleSidebar;
+        window.switchPage = switchPage;
+        window.openModal = openModal;
+        window.editStudent = editStudent;
+        window.saveStudent = saveStudent;
+        window.closeModal = closeModal;
+        window.closeDetailModal = closeDetailModal;
+        window.showDetail = showDetail;
+        window.deleteStudent = deleteStudent;
+        window.searchStudent = searchStudent;
+        window.sortByName = sortByName;
+        window.sortByIpk = sortByIpk;
+        window.sortByNilai = sortByNilai;
+        window.toggleTheme = toggleTheme;
+        window.toggleSidebar = toggleSidebar;
 
         init();
     </script>
